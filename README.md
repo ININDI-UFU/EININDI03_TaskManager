@@ -91,11 +91,11 @@ O gerenciamento eficiente de tarefas em sistemas embarcados é uma habilidade fu
 
 ## Tarefa a ser executada:
 
-- execute cada um dos codigos,
-- crie um novo arquivo esp5.cpp na pasta src,
-- copie o codigo esp4.cpp no arquivo esp5.cpp,
-- faça um função que le um valor na entrada analogica def_pin_ADC1 e escreve na serial
-- faça as ligações necessárias e veja se o codigo esta funcionando corretamente usando o teleplot.
+- Execute cada um dos códigos,
+- Crie um novo arquivo **esp5.cpp** na pasta **./src**,
+- Copie o código **esp4.cpp** no arquivo **esp5.cpp**,
+- Faça um função que lê um valor na entrada analogica **def_pin_ADC1** e escreve na serial
+- Faça as ligações necessárias e veja se o código esta funcionando corretamente usando o **teleplot**.
 
 ## Conclusão
 
