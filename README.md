@@ -1,4 +1,5 @@
-# Gerenciamento de Tarefas e Evolução Arquitetural em Sistemas Embarcados com ESP32
+# Instrumentação Industrial I
+## Aula Prática 03: Gerenciamento de Tarefas e Evolução Arquitetural em Sistemas Embarcados com ESP32
 
 O gerenciamento de tarefas em sistemas embarcados é essencial para garantir que diferentes funcionalidades sejam executadas de forma eficiente e previsível, especialmente em projetos complexos. Este repositório explora a evolução de quatro arquiteturas distintas, implementadas com ESP32, analisando os prós e contras de cada abordagem.
 
