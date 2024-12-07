@@ -37,7 +37,7 @@ O gerenciamento eficiente de tarefas em sistemas embarcados é uma habilidade fu
 - Sobrecarga no loop principal.
 - Dificuldade em gerenciar múltiplas tarefas simultaneamente.
 
-**Código:** [esp1.cpp](./esp1.cpp)
+**Código:** [esp1.cpp](./src/esp1.cpp)
 
 ---
 
@@ -53,7 +53,7 @@ O gerenciamento eficiente de tarefas em sistemas embarcados é uma habilidade fu
 - Aumento da complexidade na configuração inicial.
 - Possível overhead de desempenho dependendo do número de tarefas.
 
-**Código:** [esp2.cpp](./esp2.cpp)
+**Código:** [esp2.cpp](./src/esp2.cpp)
 
 ---
 
@@ -69,7 +69,7 @@ O gerenciamento eficiente de tarefas em sistemas embarcados é uma habilidade fu
 - Necessidade de maior atenção na manipulação das estruturas.
 - Depuração pode ser mais complexa.
 
-**Código:** [esp3.cpp](./esp3.cpp)
+**Código:** [esp3.cpp](./src/esp3.cpp)
 
 ---
 
@@ -85,9 +85,17 @@ O gerenciamento eficiente de tarefas em sistemas embarcados é uma habilidade fu
 - Complexidade inicial na implementação.
 - Maior curva de aprendizado para novos desenvolvedores no projeto.
 
-**Código:** [esp4.cpp](./esp4.cpp)
+**Código:** [esp4.cpp](./src/esp4.cpp)
 
 ---
+
+## Tarefa a ser executada:
+
+- execute cada um dos codigos,
+- crie um novo arquivo esp5.cpp na pasta src,
+- copie o codigo esp4.cpp no arquivo esp5.cpp,
+- faça um função que le um valor na entrada analogica def_pin_ADC1 e escreve na serial
+- faça as ligações necessárias e veja se o codigo esta funcionando corretamente usando o teleplot.
 
 ## Conclusão
 
@@ -96,7 +104,7 @@ A evolução apresentada neste repositório demonstra como a introdução de abs
 ---
 
 ## Links dos Códigos
-- [Código 1: Gerenciamento Rudimentar](./esp1.cpp)
-- [Código 2: Introdução de Fila e Timer](./esp2.cpp)
-- [Código 3: Estruturação com Estruturas de Dados](./esp3.cpp)
-- [Código 4: Generalização com Abstrações](./esp4.cpp)
+- [Código 1: Gerenciamento Rudimentar](./src/esp1.cpp)
+- [Código 2: Introdução de Fila e Timer](./src/esp2.cpp)
+- [Código 3: Estruturação com Estruturas de Dados](./src/esp3.cpp)
+- [Código 4: Generalização com Abstrações](./src/esp4.cpp)
