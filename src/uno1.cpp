@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define PINLED1 13
+#define PINLED 3
 
 #define TIME_DELAY_MS1 1000
 uint64_t previousTimeMS1 = 0;
@@ -32,7 +32,7 @@ void blinkLEDFunc(uint8_t pin) {
 
 void setup() {
   Serial.begin(19200);    
-  pinMode(PINLED1, OUTPUT);  
+  pinMode(PINLED, OUTPUT);  
 }
 
 void loop()
@@ -41,7 +41,7 @@ void loop()
   if ((currentTimeMS - previousTimeMS1) >= TIME_DELAY_MS1)
   {
     previousTimeMS1 = currentTimeMS;
-    blinkLEDFunc(PINLED1);
+    blinkLEDFunc(PINLED);
   }
   if ((currentTimeMS - previousTimeMS2) >= TIME_DELAY_MS2)
   {

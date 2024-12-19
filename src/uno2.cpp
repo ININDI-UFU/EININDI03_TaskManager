@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "util/asyncDelay.h"
-#define PINLED1 13
+#define PINLED 3
 
 float i = 0;
 AsyncDelay_c delayPOT(50); // time mili second
@@ -37,11 +37,11 @@ void blinkLEDFunc(uint8_t pin)
 void setup()
 {
   Serial.begin(19200);
-  pinMode(PINLED1, OUTPUT);
+  pinMode(PINLED, OUTPUT);
 }
 
 void loop()
 {
-  blinkLEDFunc(PINLED1);
+  blinkLEDFunc(PINLED);
   escreve_serial();
 }
