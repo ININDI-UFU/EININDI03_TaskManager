@@ -28,7 +28,7 @@ void blinkLed(uint8_t pin){
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(19200);
   pinMode(PIN_LED, OUTPUT);
 }
 
