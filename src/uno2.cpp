@@ -3,10 +3,10 @@
 #define PINLED 3
 
 float i = 0;
-AsyncDelay_c delayPOT(50); // time mili second
+AsyncDelay_c delayES(50); // time mili second
 void escreve_serial(void)
 {
-  if (delayPOT.isExpired()){
+  if (delayES.isExpired()){
     i += 0.1;
     // Print log
     Serial.print("casa");
@@ -21,7 +21,10 @@ void escreve_serial(void)
 
     // Plot a cosinus
     Serial.print(">Sum:");
-    Serial.println(0.8 * sin(i) + 0.2 * cos(i));
+    Serial.print(i);
+    Serial.print(":");
+    Serial.print(0.8 * sin(i) + 0.2 * cos(i));    
+    Serial.println("|g");
   }
 }
 

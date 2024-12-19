@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #define PINLED 3
 
-#define TIME_DELAY_MS1 1000
+#define TIME_DELAY_MS1 500
 uint64_t previousTimeMS1 = 0;
 
-#define TIME_DELAY_MS2 500
+#define TIME_DELAY_MS2 50
 uint64_t previousTimeMS2 = 0;
 
 float i = 0;

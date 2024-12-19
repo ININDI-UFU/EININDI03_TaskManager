@@ -4,8 +4,8 @@
 float i = 0;
 void escreve_serial(){
   i += 0.1;
+  
   // Print log
-  Serial.print("casa");
   Serial.println(i);
 
   // Plot a sinus
