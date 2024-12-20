@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #define MAXLENGTHJQUEUE 10
-#define NUM_TASKS 2
+#define NUMTASKS 2
 #include "util/jtask.h"
 
 #define PINLED 3

@@ -3,8 +3,8 @@
 
 uint8_t jtaskIndex = 0; // Índice usado para gerenciar as tarefas adicionadas à estrutura de tarefas.
 
-#ifndef NUM_TASKS
-#define NUM_TASKS 2 // Define o número máximo de tarefas se não estiver definido anteriormente.
+#ifndef NUMTASKS
+#define NUMTASKS 2 // Define o número máximo de tarefas se não estiver definido anteriormente.
 #endif
 
 #ifdef ESP32
@@ -24,7 +24,7 @@ struct CounterConfig_t
 };
 
 // Array para armazenar a configuração de tarefas
-CounterConfig_t jtaskStruct[NUM_TASKS]; // Array de tarefas com tamanho definido por NUM_TASKS.
+CounterConfig_t jtaskStruct[NUMTASKS]; // Array de tarefas com tamanho definido por NUM_TASKS.
 
 jQueue_t jtaskQueue; // Fila para armazenar as tarefas pendentes a serem executadas.
 
@@ -71,7 +71,7 @@ bool jtaskSetup(uint32_t frequency)
 
 // Adiciona uma nova tarefa à estrutura de tarefas.
 bool jtaskAttachFunc(void (*task)(), uint16_t limit) {
-    if (jtaskIndex >= NUM_TASKS) { // Verifica se há espaço para adicionar mais tarefas.
+    if (jtaskIndex >= NUMTASKS) { // Verifica se há espaço para adicionar mais tarefas.
         return false; // Retorna false se o número máximo de tarefas for atingido.
     }
     jtaskStruct[jtaskIndex].counter = 0; // Inicializa o contador da tarefa.
