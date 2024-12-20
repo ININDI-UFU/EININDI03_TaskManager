@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define MAXLENGTHJQUEUE 20
+#define MAXLENGTHJQUEUE 10
 #define NUM_TASKS 2
 #include "util/jtask.h"
 
