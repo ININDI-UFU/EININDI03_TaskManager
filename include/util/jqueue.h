@@ -6,7 +6,7 @@
 #include <string.h>
 
 #ifndef MAXLENGTHJQUEUE
-#define MAXLENGTHJQUEUE 20
+#define MAXLENGTHJQUEUE 5
 #endif
 
 // Estrutura da fila
@@ -20,13 +20,14 @@ typedef struct {
 typedef jQueue_t* jQueueHandle_t;
 
 // Função para criar uma fila
-jQueueHandle_t jQueueCreate() {
-    jQueueHandle_t queue;
+bool jQueueCreate(jQueueHandle_t queue) {
+    if (queue == nullptr) {
+        return false;         // Fila cheia
+    }
     queue->head = 0;
     queue->tail = 0;
     queue->count = 0;
-
-    return queue;
+    return true;
 }
 
 // Função para enviar um item para a fila a partir de uma ISR
