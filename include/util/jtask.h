@@ -1,27 +1,65 @@
+/**
+ * @file jtask.cpp
+ * @brief Biblioteca para gerenciamento de tarefas usando timers no Arduino e ESP32.
+ *
+ * Este arquivo implementa a estrutura para configurar, agendar e executar tarefas
+ * de maneira eficiente usando filas e interrupções de timer.
+ */
+
 #include "Arduino.h"
 #include "util/jqueue.h"
 
+/** 
+ * @brief Índice para rastrear o número de tarefas registradas.
+ */
 uint8_t jtaskIndex = 0;
 
 #ifndef NUMTASKS
+/**
+ * @brief Número máximo de tarefas que podem ser registradas.
+ */
 #define NUMTASKS 2
 #endif
 
-// Estrutura para configuração das tarefas
+/**
+ * @struct CounterConfig_t
+ * @brief Estrutura para configuração das tarefas.
+ *
+ * @param counter Contador interno da tarefa.
+ * @param limit Valor limite para acionar a tarefa.
+ * @param task Ponteiro para a função da tarefa.
+ */
 struct CounterConfig_t {
     uint16_t counter;
     uint16_t limit;
     void (*task)();
 };
 
-CounterConfig_t jtaskStruct[NUMTASKS]; // Array de tarefas
-jQueue_t jtaskQueue; // Fila para execução das tarefas
+/**
+ * @brief Array que armazena as configurações das tarefas.
+ */
+CounterConfig_t jtaskStruct[NUMTASKS];
+
+/**
+ * @brief Fila para gerenciamento e execução das tarefas.
+ */
+jQueue_t jtaskQueue;
 
 #ifdef ESP32
+/**
+ * @brief Ponteiro para o timer no ESP32.
+ */
 hw_timer_t *timer = nullptr;
-void IRAM_ATTR timerCallback() { // Função de callback do timer no ESP32
+
+/**
+ * @brief Função de callback do timer no ESP32.
+ */
+void IRAM_ATTR timerCallback() {
 #else
-ISR(TIMER2_COMPA_vect) { // Função de callback do timer no Arduino Uno (Timer 2)
+/**
+ * @brief Função de callback do timer no Arduino Uno (Timer 2).
+ */
+ISR(TIMER2_COMPA_vect) {
 #endif    
     for (uint8_t i = 0; i < jtaskIndex; i++) {
         if (++jtaskStruct[i].counter >= jtaskStruct[i].limit) {
@@ -31,8 +69,12 @@ ISR(TIMER2_COMPA_vect) { // Função de callback do timer no Arduino Uno (Timer 
     }
 }
 
-
-// Configuração do timer
+/**
+ * @brief Configuração do timer para acionar as tarefas periodicamente.
+ *
+ * @param frequency Frequência em Hz para o timer.
+ * @return true se a configuração foi bem-sucedida, false caso contrário.
+ */
 bool jtaskSetup(uint32_t frequency) {
     #ifdef ESP32
     timer = timerBegin(0, 80, true); // Inicializa o timer com prescaler de 80
@@ -53,7 +95,13 @@ bool jtaskSetup(uint32_t frequency) {
     return jQueueCreate(&jtaskQueue); // Cria a fila de tarefas
 }
 
-// Anexa uma nova tarefa
+/**
+ * @brief Registra uma nova tarefa para ser executada periodicamente.
+ *
+ * @param task Ponteiro para a função da tarefa.
+ * @param limit Valor limite para acionar a tarefa.
+ * @return true se a tarefa foi registrada com sucesso, false caso contrário.
+ */
 bool jtaskAttachFunc(void (*task)(), uint16_t limit) {
     if (jtaskIndex >= NUMTASKS) return false; // Verifica limite de tarefas
     jtaskStruct[jtaskIndex] = {0, limit, task}; // Configura a tarefa
@@ -61,7 +109,11 @@ bool jtaskAttachFunc(void (*task)(), uint16_t limit) {
     return true;
 }
 
-// Executa as tarefas enfileiradas
+/**
+ * @brief Executa as tarefas enfileiradas.
+ *
+ * Esta função deve ser chamada regularmente dentro do loop principal do programa.
+ */
 void jtaskLoop() {
     void (*taskMessage)();
     while (jQueueReceive(&jtaskQueue, &taskMessage)) {
