@@ -63,7 +63,7 @@ ISR(TIMER2_COMPA_vect) {
 #endif    
     for (uint8_t i = 0; i < jtaskIndex; i++) {
         if (++jtaskStruct[i].counter >= jtaskStruct[i].limit) {
-            jQueueSendFromISR(&jtaskQueue, jtaskStruct[i].task);
+            jQueueSendFromISR(&jtaskQueue, (void *)jtaskStruct[i].task);
             jtaskStruct[i].counter = 0;
         }
     }
@@ -76,6 +76,8 @@ ISR(TIMER2_COMPA_vect) {
  * @return true se a configuração foi bem-sucedida, false caso contrário.
  */
 bool jtaskSetup(uint32_t frequency) {
+    jQueueInit(&jtaskQueue); // Inicializa a fila
+
     #ifdef ESP32
     timer = timerBegin(0, 80, true); // Inicializa o timer com prescaler de 80
     timerAttachInterrupt(timer, &timerCallback, true); // Configura a interrupção
@@ -92,7 +94,8 @@ bool jtaskSetup(uint32_t frequency) {
 
     sei(); // Habilita interrupções globais
     #endif
-    return jQueueCreate(&jtaskQueue); // Cria a fila de tarefas
+
+    return true;
 }
 
 /**
@@ -116,7 +119,7 @@ bool jtaskAttachFunc(void (*task)(), uint16_t limit) {
  */
 void jtaskLoop() {
     void (*taskMessage)();
-    while (jQueueReceive(&jtaskQueue, &taskMessage)) {
+    while (jQueueReceive(&jtaskQueue, (void **)&taskMessage)) {
         taskMessage(); // Executa a tarefa
     }
 }
