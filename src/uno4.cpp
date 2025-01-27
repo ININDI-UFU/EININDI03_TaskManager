@@ -38,7 +38,7 @@ CounterConfig taskStruct[] = {
 void setup() {
     Serial.begin(115200);
     // Configura o timer para 1000 Hz (1 ms)
-    taskSetup(1000);
+    taskSetup(taskStruct,2);
 }
 
 void loop() {

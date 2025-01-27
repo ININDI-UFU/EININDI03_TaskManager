@@ -13,7 +13,8 @@ struct CounterConfig
 };
 
 // Esta variável será definida no arquivo principal (ex: no .ino)
-extern CounterConfig taskStruct[];
+CounterConfig *taskStruct = nullptr; // Ponteiro para o array de configurações
+size_t taskCount = 0;                // Quantidade de configurações no array
 
 // Parâmetros da "fila"
 #define TASK_QUEUE_SIZE 20  // Ajuste conforme a necessidade
@@ -25,16 +26,16 @@ volatile uint8_t taskQueueTail = 0;
 void timerCallback()
 {
     // Incrementa contadores e verifica limites
-    for (auto &c : taskStruct)
+    for (size_t i = 0; i < taskCount; ++i)
     {
-        c.counter++;
+        CounterConfig &c = taskStruct[i];
         if (c.counter >= c.limit)
         {
             // Tenta colocar a função na fila
             uint8_t nextTail = (taskQueueTail + 1) % TASK_QUEUE_SIZE;
             if (nextTail != taskQueueHead) // Verifica se há espaço na fila
             {
-                taskQueue[taskQueueTail] = c.task;
+                taskQueue[taskQueueTail] = reinterpret_cast<volatile void (*)()>(c.task);
                 taskQueueTail = nextTail;
             }
             c.counter = 0; // Reinicia o contador
@@ -45,8 +46,10 @@ void timerCallback()
 // Configuração inicial do timer
 // frequency: frequência em Hz
 // Ex: se frequency = 1000, a ISR é chamada 1000 vezes por segundo (a cada 1ms)
-void taskSetup(uint32_t frequency)
+void taskSetup(CounterConfig *tasks, size_t count, uint32_t frequency=1000)
 {
+    taskStruct = tasks; // Passa o ponteiro do array de configurações para a variável global
+    taskCount = count;  // Armazena o tamanho do array
     // Calcula o período em microssegundos
     unsigned long periodMicroseconds = 1000000UL / frequency;
 
@@ -66,7 +69,7 @@ void taskLoop()
     noInterrupts(); // Desabilita interrupções momentaneamente para acesso seguro aos índices
     while (taskQueueHead != taskQueueTail)
     {
-        void (*taskMessage)() = taskQueue[taskQueueHead];
+        void (*taskMessage)() = reinterpret_cast<void (*)()>(taskQueue[taskQueueHead]);
         taskQueueHead = (taskQueueHead + 1) % TASK_QUEUE_SIZE;
         interrupts(); // Reabilita interrupções para executar a função de forma segura
         // Executa a tarefa

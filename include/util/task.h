@@ -14,13 +14,15 @@ struct CounterConfig
     void (*task)();
 };
 
-extern CounterConfig taskStruct[]; // Permite que `counters` seja definido fora da biblioteca
+CounterConfig *taskStruct = nullptr; // Ponteiro para o array de configurações
+size_t taskCount = 0;                // Quantidade de configurações no array
 
 // Função chamada pelo timer
 void IRAM_ATTR timerCallback()
 {
-    for (auto &c : taskStruct)
+    for (size_t i = 0; i < taskCount; ++i)
     {
+        CounterConfig &c = taskStruct[i];
         if (++c.counter == c.limit)
         {
             xQueueSendFromISR(taskQueue, &c.task, nullptr); // Envia o valor para a fila
@@ -30,8 +32,10 @@ void IRAM_ATTR timerCallback()
 }
 
 // Configuração inicial do timer
-void taskSetup(uint32_t frequency, uint32_t bufferSize)
+void taskSetup(CounterConfig *tasks, size_t count, uint32_t frequency=1000, uint32_t bufferSize=1024)
 {
+    taskStruct = tasks; // Passa o ponteiro do array de configurações para a variável global
+    taskCount = count;  // Armazena o tamanho do array
     // Configuração do timer
     timer = timerBegin(frequency);                           // Inicializa o timer com a frequência de amostragem.
     timerAttachInterrupt(timer, &timerCallback);             // Associa a função timerCallback como a ISR do timer.

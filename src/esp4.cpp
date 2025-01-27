@@ -34,7 +34,7 @@ void setup() {
     IIKit.setup();
     pinMode(def_pin_D1, OUTPUT);
     // Configuração do timer
-    taskSetup(1000,1024);
+    taskSetup(taskStruct,2,1000,1024);
 }
 
 // Loop principal
