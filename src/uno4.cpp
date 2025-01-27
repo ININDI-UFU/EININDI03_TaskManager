@@ -19,7 +19,7 @@ void escreve_serial(void) {
     Serial.print(sin(i));
     Serial.println("|g");
 
-    Serial.print(">Sum:");
+    Serial.print(">Func:");
     Serial.print(i);
     Serial.print(":");
     Serial.print(0.8 * sin(i) + 0.2 * cos(i));
