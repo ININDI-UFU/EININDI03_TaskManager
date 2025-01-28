@@ -1,5 +1,7 @@
 //https://docs.espressif.com/projects/arduino-esp32/en/latest/api/timer.html
 #include "IIKit.h"   // Biblioteca base do framework Arduino, necessária para funções básicas como Serial e delays.
+#define MAXLENGTHJQUEUE 1024
+#define NUMTASKS 2
 #include "util/jtask.h"
 
 //Funçao de alterar o estado de um led
@@ -30,7 +32,7 @@ void setup() {
     pinMode(def_pin_D1, OUTPUT);
     jtaskSetup(1000);    // Configura o timer para 1000 Hz (1 ms)
     jtaskAttachFunc(managerInputFunc, 50); //anexa um função e sua base de tempo para ser executada
-    jtaskAttachFunc([](){blinkLEDFunc(def_pin_D1)}, 500);  //anexa um função e sua base de tempo para ser executada
+    jtaskAttachFunc([](){blinkLEDFunc(def_pin_D1);}, 500);  //anexa um função e sua base de tempo para ser executada
 }
 
 // Loop principal
