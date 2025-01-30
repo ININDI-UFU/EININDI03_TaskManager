@@ -32,14 +32,14 @@
 #define def_pin_D4 33      ///< GPIO para I/O digital 4.
 #define def_pin_DAC1 25    ///< GPIO para saída DAC1.
 #define def_pin_W4a20_1 26 ///< GPIO para saída 4-20mA 1.
-#define def_pin_RELE 23    ///< GPIO para relé.
+#define def_pin_RELE 39    ///< GPIO para relé.
 #define def_pin_SDA 21     ///< GPIO para SDA do display OLED.
 #define def_pin_SCL 22     ///< GPIO para SCL do display OLED.
 #define def_pin_PWM 36     ///< GPIO para saída PWM.
 #define def_pin_RTN1 18    ///< GPIO para botão retentivo 1.
-#define def_pin_RTN2 2     ///< GPIO para botão retentivo 2.
-#define def_pin_PUSH1 16   ///< GPIO para botão push 1.
-#define def_pin_PUSH2 17   ///< GPIO para botão push 2.
+#define def_pin_RTN2 19    ///< GPIO para botão retentivo 2.
+#define def_pin_PUSH1 23   ///< GPIO para botão push 1.
+#define def_pin_PUSH2 4    ///< GPIO para botão push 2.
 
 /**
  * @class IIKit_c
