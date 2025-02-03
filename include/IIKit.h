@@ -23,6 +23,7 @@
 #include "util/asyncDelay.h"
 #include "util/din.h"
 #include "services/ads1115_c.h"
+#include "services/hart_c.h"
 
 /********** GPIO DEFINITIONS ***********/
 #define def_pin_RELE 39    ///< GPIO para relé.
@@ -59,6 +60,7 @@ private:
     char DDNSName[15] = "inindkit"; ///< Nome do dispositivo para DDNS.
     WifiManager_c wm;               ///< Gerenciador de conexões Wi-Fi.
     ADS1115_c ads;                  ///< Conversor ADC.
+    Hart_c hart;
 
     /**
      * @brief Exibe mensagens de erro e reinicia o dispositivo se necessário.
@@ -113,7 +115,7 @@ public:
 inline void IIKit_c::setup()
 {
     WSerial.println("Booting");
-
+    hart.setup(&WSerial);
     /********** Inicializando Display ***********/
     if (startDisplay(&disp, def_pin_SDA, def_pin_SCL))
     {
@@ -129,9 +131,9 @@ inline void IIKit_c::setup()
 
     /********** Inicializando EEPROM ***********/
     EEPROM.begin(1);
-    char idKit[2] = "2";
-    EEPROM.write(0, (uint8_t)idKit[0]);
-    EEPROM.commit();
+    char idKit[2] = "0";
+    //EEPROM.write(0, (uint8_t)idKit[0]);
+    //EEPROM.commit();
     idKit[0] = (char)EEPROM.read(0);
     strcat(DDNSName, idKit);
 
@@ -198,10 +200,10 @@ inline void IIKit_c::setup()
             disp.setText(2, DDNSName);
         } });
 
-    digitalWrite(def_pin_D1, LOW);
-    digitalWrite(def_pin_D2, LOW);
-    digitalWrite(def_pin_D3, LOW);
-    digitalWrite(def_pin_D4, LOW);
+    digitalWrite(def_pin_D1, HIGH);
+    digitalWrite(def_pin_D2, HIGH);
+    digitalWrite(def_pin_D3, HIGH);
+    digitalWrite(def_pin_D4, HIGH);
     digitalWrite(def_pin_RELE, LOW);
     analogWrite(def_pin_PWM, 0);
     analogWrite(def_pin_DAC1, 0);
