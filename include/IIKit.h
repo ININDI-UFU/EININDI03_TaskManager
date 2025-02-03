@@ -39,7 +39,15 @@
 #define def_pin_SDA 21     ///< GPIO para SDA do display OLED.
 #define def_pin_RTN2 19    ///< GPIO para botão retentivo 2.
 #define def_pin_RTN1 18    ///< GPIO para botão retentivo 1.
+///< GPIO15 - ESP_PROG_TDO:6
+///< GPIO14 - ESP_PROG_TMS:2
+///< GPIO13 - ESP_PROG_TCK:4
+///< GPIO12 - ESP_PROG_TDI:8
 #define def_pin_PUSH2 4    ///< GPIO para botão push 2.
+///< GPIO3  - ESP_COM_TX:3
+///< GPIO1  - ESP_COM_RX:5
+///< GPIO0  - ESP_COM_BOOT:6
+///< ESPEN  - ESP_COM_EN:1
 
 /**
  * @class IIKit_c
