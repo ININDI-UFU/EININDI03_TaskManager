@@ -33,7 +33,9 @@ void blinkLEDFunc() {
 
 // Configuração inicial
 void setup() {
-    Serial.begin(115200);    
+    Serial.begin(
+        
+    );    
     pinMode(PINLED, OUTPUT);
     jtaskSetup(1000);    // Configura o timer para 1000 Hz (1 ms)
     jtaskAttachFunc(escreve_serial, 50); //anexa um função e sua base de tempo para ser executada
