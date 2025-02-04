@@ -131,9 +131,9 @@ inline void IIKit_c::setup()
 
     /********** Inicializando EEPROM ***********/
     EEPROM.begin(1);
-    char idKit[2] = "0";
-    EEPROM.write(0, (uint8_t)idKit[0]);
-    EEPROM.commit();
+    char idKit[2] = "3";
+    // EEPROM.write(0, (uint8_t)idKit[0]);
+    // EEPROM.commit();
     idKit[0] = (char)EEPROM.read(0);
     strcat(DDNSName, idKit);
 
