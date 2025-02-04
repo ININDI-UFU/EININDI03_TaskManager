@@ -32,13 +32,6 @@ void setup() {
     jtaskSetup(1000);    // Configura o timer para 1000 Hz (1 ms)
     jtaskAttachFunc(managerInputFunc, 50); //anexa um função e sua base de tempo para ser executada
     jtaskAttachFunc([](){blinkLEDFunc(def_pin_D3);}, 500);  //anexa um função e sua base de tempo para ser executada
-    //jtaskAttachFunc([](){blinkLEDFunc(def_pin_D4);}, 1000);  //anexa um função e sua base de tempo para ser executada
-    IIKit.WSerial.onInputReceived([](String str) {
-        if(str == "^q") IIKit.WSerial.stop(); 
-        else IIKit.WSerial.print(str); 
-        }
-    );
-    IIKit.rtn_1.onValueChanged([](uint8_t status) {digitalWrite(def_pin_D4,status);});
 }
 
 // Loop principal

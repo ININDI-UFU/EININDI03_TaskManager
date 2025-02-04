@@ -121,15 +121,15 @@ void DIn_c::setPin(uint8_t pinDIn) {
 
 bool DIn_c::debounce() {
     uint8_t leitura = digitalRead(pin);
-    if (pressed_DIn_time > 0 && leitura == HIGH && status_DIn == HIGH && (xTaskGetTickCount() - reading_time) > pressed_DIn_time) {
-        reading_time = xTaskGetTickCount();
+    if (pressed_DIn_time > 0 && leitura == HIGH && status_DIn == HIGH && (millis() - reading_time) > pressed_DIn_time) {
+        reading_time = millis();
         onPressed();
     }
     if (leitura != last_status_DIn) {
-        reading_time = xTaskGetTickCount();
+        reading_time = millis();
         last_status_DIn = leitura;
     }
-    if ((xTaskGetTickCount() - reading_time) > DEBOUNCETIME) {
+    if ((millis() - reading_time) > DEBOUNCETIME) {
         if (leitura != status_DIn) {
             status_DIn = leitura;
             return true;
