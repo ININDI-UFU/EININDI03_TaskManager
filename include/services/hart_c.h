@@ -1,8 +1,6 @@
 #include <HardwareSerial.h>
 #include <services/wserial_c.h>
 
-// Create an instance of HardwareSerial for UART1
-HardwareSerial Serial1(1);
 
 /**
  * @class HART

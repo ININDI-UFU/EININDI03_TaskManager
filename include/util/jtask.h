@@ -79,10 +79,10 @@ bool jtaskSetup(uint32_t frequency) {
     jQueueInit(&jtaskQueue); // Inicializa a fila
 
     #ifdef ESP32
-    timer = timerBegin(frequency); // Inicializa o timer com prescaler de 80
-    timerAttachInterrupt(timer, &timerCallback); // Configura a interrupção
-    // timerAlarmWrite(timer, 80000000 / (80 * frequency), true); // Define a frequência
-    // timerAlarmEnable(timer); // Ativa o alarme
+    timer = timerBegin(0, 80, true); // Inicializa o timer com prescaler de 80
+    timerAttachInterrupt(timer, &timerCallback, true); // Configura a interrupção
+    timerAlarmWrite(timer, 80000000 / (80 * frequency), true); // Define a frequência
+    timerAlarmEnable(timer); // Ativa o alarme
     #else
     cli(); // Desativa interrupções
 

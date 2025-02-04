@@ -199,11 +199,10 @@ inline void IIKit_c::setup()
             disp.setFuncMode(false);
             disp.setText(2, DDNSName);
         } });
-
-    digitalWrite(def_pin_D1, HIGH);
-    digitalWrite(def_pin_D2, HIGH);
-    digitalWrite(def_pin_D3, HIGH);
-    digitalWrite(def_pin_D4, HIGH);
+    digitalWrite(def_pin_D1, LOW);
+    digitalWrite(def_pin_D2, LOW);        
+    digitalWrite(def_pin_D3, LOW);
+    digitalWrite(def_pin_D4, LOW);
     digitalWrite(def_pin_RELE, LOW);
     analogWrite(def_pin_PWM, 0);
     analogWrite(def_pin_DAC1, 0);
