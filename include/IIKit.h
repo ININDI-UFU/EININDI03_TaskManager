@@ -21,7 +21,7 @@
 #include "services/wifimanager_c.h"
 
 #include "util/asyncDelay.h"
-#include "util/din.h"
+#include "util/DebouncedInput.h"
 #include "services/ads1115_c.h"
 #include "services/hart_c.h"
 
@@ -70,10 +70,10 @@ private:
     void errorMsg(String error, bool restart = true);
 
 public:
-    DIn_c rtn_1;       ///< Botão de retorno 1.
-    DIn_c rtn_2;       ///< Botão de retorno 2.
-    DIn_c push_1;      ///< Botão push 1.
-    DIn_c push_2;      ///< Botão push 2.
+    DebouncedInput  rtn_1;       ///< Botão de retorno 1.
+    DebouncedInput  rtn_2;       ///< Botão de retorno 2.
+    DebouncedInput  push_1;      ///< Botão push 1.
+    DebouncedInput  push_2;      ///< Botão push 2.
     Display_c disp;    ///< Display OLED.
     WSerial_c WSerial; ///< Conexão Telnet e Serial.
 
@@ -183,22 +183,11 @@ inline void IIKit_c::setup()
     pinMode(def_pin_RELE, OUTPUT);
     pinMode(def_pin_W4a20_1, OUTPUT);
 
-    rtn_1.setPin(def_pin_RTN1);
-    rtn_2.setPin(def_pin_RTN2);
-    push_1.setPin(def_pin_PUSH1);
-    push_2.setPin(def_pin_PUSH2);
+    rtn_1.setup(def_pin_RTN1, FALLING, 50000UL, true);
+    rtn_2.setup(def_pin_RTN2, FALLING, 50000UL, true);
+    push_1.setup(def_pin_PUSH1, FALLING, 50000UL, true);
+    push_2.setup(def_pin_PUSH2, FALLING, 50000UL, true);
 
-    push_1.setTimeOnPressed(3);
-    push_1.onPressedWithTime([this]()
-                             {
-        if (wm.changeWebPortal()) {
-            disp.setFuncMode(true);
-            disp.setText(2, "Web Portal ON", true);
-            disp.setText(3, "", true);
-        } else {
-            disp.setFuncMode(false);
-            disp.setText(2, DDNSName);
-        } });
     digitalWrite(def_pin_D1, LOW);
     digitalWrite(def_pin_D2, LOW);        
     digitalWrite(def_pin_D3, LOW);
@@ -225,10 +214,10 @@ void IIKit_c::loop(void)
         wm.process();
     }
 
-    updateDIn(&rtn_1);
-    updateDIn(&rtn_2);
-    updateDIn(&push_1);
-    updateDIn(&push_2);
+    rtn_1.update();
+    rtn_2.update();
+    push_1.update();
+    push_2.update();
 }
 
 uint16_t IIKit_c::analogReadPot1(void)
