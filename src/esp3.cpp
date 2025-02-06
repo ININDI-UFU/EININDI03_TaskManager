@@ -25,8 +25,10 @@ void managerInputFunc(void) {
     IIKit.WSerial.plot("vlR4a20_2", vlR4a20_2);
 }
 
-DigitalDebounce RTN1(def_pin_PUSH1, 50, [](bool state){digitalWrite(def_pin_D3, state);});
-DigitalDebounce RTN2(def_pin_PUSH2, 50, [](bool state){digitalWrite(def_pin_D4, state);});
+//DigitalDebounce RTN1(def_pin_RTN1, 50, [](bool state){digitalWrite(def_pin_D1, state);});
+//DigitalDebounce RTN2(def_pin_RTN2, 50, [](bool state){digitalWrite(def_pin_D2, state);});
+DigitalDebounce PUSH1(def_pin_PUSH1, 50, [](bool state){digitalWrite(def_pin_D3, state);});
+DigitalDebounce PUSH2(def_pin_PUSH2, 50, [](bool state){digitalWrite(def_pin_D4, state);});
 
 // Configuração inicial do programa
 void setup() {
@@ -44,6 +46,8 @@ void loop() {
   // Monitora os perifericos
   IIKit.loop();
   jtaskLoop();
-  RTN1.update();  // Atualiza a leitura com debounce
-  RTN2.update();  // Atualiza a leitura com debounce 
+  //RTN1.update();  // Atualiza a leitura com debounce
+  //RTN2.update();  // Atualiza a leitura com debounce 
+  PUSH1.update();  // Atualiza a leitura com debounce
+  PUSH2.update();  // Atualiza a leitura com debounce   
 }
