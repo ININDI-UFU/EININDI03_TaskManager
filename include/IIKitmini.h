@@ -17,11 +17,10 @@
 
 /********** GPIO DEFINITIONS ***********/
 #define def_pin_ADC1 39    ///< GPIO para entrada ADC1.
-#define def_pin_PUSH2 36    ///< GPIO para botão push 2.
 #define def_pin_RTN2 35    ///< GPIO para botão retentivo 2.
 #define def_pin_PUSH1 34   ///< GPIO para botão push 1.
 #define def_pin_PWM 33     ///< GPIO para saída PWM.
-#define def_pin_RTN1 32    ///< GPIO para botão retentivo 1.
+#define def_pin_PUSH2 32    ///< GPIO para botão push 2.
 #define def_pin_RELE 27    ///< GPIO para relé.
 #define def_pin_W4a20_1 26 ///< GPIO para saída 4-20mA 1.
 #define def_pin_DAC1 25    ///< GPIO para saída DAC1.
@@ -36,6 +35,7 @@
 ///< GPIO12 - ESP_PROG_TDI:8
 #define def_pin_D4 4      ///< GPIO para I/O digital 4.
 ///< GPIO3  - ESP_COM_TX:3
+#define def_pin_RTN1 2    ///< GPIO para botão retentivo 1.
 ///< GPIO1  - ESP_COM_RX:5
 ///< GPIO0  - ESP_COM_BOOT:6
 ///< ESPEN  - ESP_COM_EN:1

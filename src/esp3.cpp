@@ -25,8 +25,8 @@ void managerInputFunc(void) {
     IIKit.WSerial.plot("vlR4a20_2", vlR4a20_2);
 }
 
-DigitalDebounce RTN1(def_pin_RTN1, 50, [](bool state){digitalWrite(def_pin_D3, state);});
-DigitalDebounce RTN2(def_pin_RTN2, 50, [](bool state){digitalWrite(def_pin_D4, state);});
+DigitalDebounce RTN1(def_pin_PUSH1, 50, [](bool state){digitalWrite(def_pin_D3, state);});
+DigitalDebounce RTN2(def_pin_PUSH2, 50, [](bool state){digitalWrite(def_pin_D4, state);});
 
 // Configuração inicial do programa
 void setup() {
