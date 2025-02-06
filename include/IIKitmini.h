@@ -1,5 +1,5 @@
 /**
- * @file IIdKit.h
+ * @file IIKitmini.h
  * @brief Classe para gerenciamento de dispositivos industriais utilizando ESP32.
  *
  * Esta classe oferece suporte para gerenciamento de entradas digitais, saídas analógicas,
@@ -7,30 +7,21 @@
  * industriais baseadas em ESP32.
  */
 
-#ifndef __ININDKIT_H
-#define __ININDKIT_H
+#ifndef __IIDKITMINI_H
+#define __IIDKITMINI_H
 
-#include <HardwareSerial.h>
-#include <ESPmDNS.h>
-#include <EEPROM.h>
-#include <WiFi.h>
-
-#include "services/OTA.h"
-#include "services/WSerial_c.h"
 #include "services/display_c.h"
-#include "services/wifimanager_c.h"
-
-#include "util/asyncDelay.h"
-#include "util/DebouncedInput.h"
 #include "services/ads1115_c.h"
+#include "util/din.h"
 #include "services/hart_c.h"
 
-#define def_pin_RTN1 39    ///< GPIO para botão retentivo 1.
-#define def_pin_RTN2 36    ///< GPIO para botão retentivo 2.
-#define def_pin_PUSH1 35   ///< GPIO para botão push 1.
-#define def_pin_PUSH2 34    ///< GPIO para botão push 2.
+/********** GPIO DEFINITIONS ***********/
+#define def_pin_ADC1 39    ///< GPIO para entrada ADC1.
+#define def_pin_PUSH2 36    ///< GPIO para botão push 2.
+#define def_pin_RTN2 35    ///< GPIO para botão retentivo 2.
+#define def_pin_PUSH1 34   ///< GPIO para botão push 1.
 #define def_pin_PWM 33     ///< GPIO para saída PWM.
-#define def_pin_ADC1 32    ///< GPIO para entrada ADC1.
+#define def_pin_RTN1 32    ///< GPIO para botão retentivo 1.
 #define def_pin_RELE 27    ///< GPIO para relé.
 #define def_pin_W4a20_1 26 ///< GPIO para saída 4-20mA 1.
 #define def_pin_DAC1 25    ///< GPIO para saída DAC1.
@@ -50,29 +41,16 @@
 ///< ESPEN  - ESP_COM_EN:1
 
 /**
- * @class IIKit_c
- * @brief Classe para gerenciamento do kit industrial.
+ * @class IIKitmini_c
+ * @brief Classe para gerenciamento do kit industrial sem wifi.
  */
-class IIKit_c
+class IIKitmini_c
 {
 private:
-    char DDNSName[15] = "inindkit"; ///< Nome do dispositivo para DDNS.
-    WifiManager_c wm;               ///< Gerenciador de conexões Wi-Fi.
     ADS1115_c ads;                  ///< Conversor ADC.
     Hart_c hart;
 
-    /**
-     * @brief Exibe mensagens de erro e reinicia o dispositivo se necessário.
-     * @param error Mensagem de erro.
-     * @param restart Indica se o dispositivo deve ser reiniciado.
-     */
-    void errorMsg(String error, bool restart = true);
-
 public:
-    DebouncedInput  rtn_1;       ///< Botão de retorno 1.
-    DebouncedInput  rtn_2;       ///< Botão de retorno 2.
-    DebouncedInput  push_1;      ///< Botão push 1.
-    DebouncedInput  push_2;      ///< Botão push 2.
     Display_c disp;    ///< Display OLED.
     WSerial_c WSerial; ///< Conexão Telnet e Serial.
 
@@ -111,7 +89,7 @@ public:
     uint16_t analogRead4a20_2(void);
 };
 
-inline void IIKit_c::setup()
+inline void IIKitmini_c::setup()
 {
     WSerial.println("Booting");
     hart.setup(&WSerial);
@@ -121,51 +99,15 @@ inline void IIKit_c::setup()
         disp.setText(1, "Inicializando...");
         WSerial.println("Display running");
     }
-    else
-    {
-        errorMsg("Display error.", false);
-    }
 
     delay(50);
 
-    /********** Inicializando EEPROM ***********/
-    EEPROM.begin(1);
-    char idKit[2] = "3";
-    // EEPROM.write(0, (uint8_t)idKit[0]);
-    // EEPROM.commit();
-    idKit[0] = (char)EEPROM.read(0);
-    strcat(DDNSName, idKit);
-
     /********** Configurando Wi-Fi ***********/
-    WiFi.mode(WIFI_STA);
-    wm.start(&WSerial);
-    wm.setApName(DDNSName);
-
-    disp.setFuncMode(true);
-    disp.setText(1, "Mode: Acces Point", true);
-    disp.setText(2, "SSID: AutoConnectAP", true);
-    disp.setText(3, "PSWD: ", true);
-
-    if (wm.autoConnect("AutoConnectAP"))
-    {
-        WSerial.print("\nWifi running - IP:");
-        WSerial.println(WiFi.localIP());
-        disp.setFuncMode(false);
-        disp.setText(1, (WiFi.localIP().toString() + " ID:" + String(idKit[0])).c_str());
-        disp.setText(2, DDNSName);
-        disp.setText(3, "UFU Mode");
-        delay(50);
-    }
-    else
-    {
-        errorMsg("Wifi error.\nAP MODE...", false);
-    }
-
-    /********** Inicializando OTA ***********/
-    OTA::start(DDNSName);
+    disp.setFuncMode(false);
+    disp.setText(1, "Mode: sem WIFI", false);
 
     /********** Inicializando Telnet ***********/
-    startWSerial(&WSerial, 4000 + String(idKit[0]).toInt(), 115200);
+    startWSerial(&WSerial, 115200);
 
     /********** Configurando GPIOs ***********/
     pinMode(def_pin_RTN1, INPUT_PULLDOWN);
@@ -182,11 +124,6 @@ inline void IIKit_c::setup()
     pinMode(def_pin_RELE, OUTPUT);
     pinMode(def_pin_W4a20_1, OUTPUT);
 
-    rtn_1.setup(def_pin_RTN1, FALLING, 50000UL);
-    rtn_2.setup(def_pin_RTN2, FALLING, 50000UL);
-    push_1.setup(def_pin_PUSH1, FALLING, 50000UL);
-    push_2.setup(def_pin_PUSH2, FALLING, 50000UL);
-
     digitalWrite(def_pin_D1, LOW);
     digitalWrite(def_pin_D2, LOW);        
     digitalWrite(def_pin_D3, LOW);
@@ -196,60 +133,35 @@ inline void IIKit_c::setup()
     analogWrite(def_pin_DAC1, 0);
     analogWrite(def_pin_W4a20_1, 0);
 
-    if (!ads.begin())
-    {
-        errorMsg("ADS error.", true);
-    }
+    ads.begin();
 }
 
-void IIKit_c::loop(void)
+void IIKitmini_c::loop(void)
 {
-    OTA::handle();
     updateWSerial(&WSerial);
     updateDisplay(&disp);
-
-    if (wm.getPortalRunning())
-    {
-        wm.process();
-    }
-
-    rtn_1.update();
-    rtn_2.update();
-    push_1.update();
-    push_2.update();
 }
 
-uint16_t IIKit_c::analogReadPot1(void)
+uint16_t IIKitmini_c::analogReadPot1(void)
 {
     return ads.analogRead(1);
 }
 
-uint16_t IIKit_c::analogReadPot2(void)
+uint16_t IIKitmini_c::analogReadPot2(void)
 {
     return ads.analogRead(0);
 }
 
-uint16_t IIKit_c::analogRead4a20_1(void)
+uint16_t IIKitmini_c::analogRead4a20_1(void)
 {
     return ads.analogRead(3);
 }
 
-uint16_t IIKit_c::analogRead4a20_2(void)
+uint16_t IIKitmini_c::analogRead4a20_2(void)
 {
     return ads.analogRead(2);
 }
 
-void IIKit_c::errorMsg(String error, bool restart)
-{
-    WSerial.println(error);
-    if (restart)
-    {
-        WSerial.println("Rebooting now...");
-        delay(2000);
-        ESP.restart();
-    }
-}
-
-IIKit_c IIKit;
+IIKitmini_c IIKit;
 
 #endif

@@ -50,11 +50,11 @@ void jQueueInit(jQueue_t *queue) {
  */
 bool jQueueSendFromISR(jQueue_t *queue, void *item) {
     if (queue->count == MAXLENGTHJQUEUE) return false; // Verifica se a fila está cheia.
-    noInterrupts();
+    //noInterrupts();
     queue->buffer[queue->tail] = item;
     queue->tail = (queue->tail + 1) % MAXLENGTHJQUEUE;
     queue->count++;
-    interrupts();
+    //interrupts();
     return true;
 }
 
@@ -67,11 +67,11 @@ bool jQueueSendFromISR(jQueue_t *queue, void *item) {
  */
 bool jQueueReceive(jQueue_t *queue, void **item) {
     if (queue->count == 0) return false; // Verifica se a fila está vazia.
-    noInterrupts();
+    //noInterrupts();
     *item = queue->buffer[queue->head];
     queue->head = (queue->head + 1) % MAXLENGTHJQUEUE;
     queue->count--;
-    interrupts();
+    //interrupts();
     return true;
 }
 

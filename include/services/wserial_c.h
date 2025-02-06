@@ -10,7 +10,6 @@
 #define __WSERIAL_H
 
 #include <Arduino.h>
-#include "ESPTelnet.h"
 
 #define BAUD_RATE 115200 ///< Taxa de transmissão padrão para comunicação serial.
 
@@ -18,8 +17,16 @@
  * @class WSerial_c
  * @brief Classe para gerenciamento de conexões Telnet e comunicação serial.
  */
-class WSerial_c : public ESPTelnet {
+class WSerial_c
+{
+    typedef void (*CallbackFunction)(String str);
+
 protected:
+    CallbackFunction on_input = NULL;
+    void onInputReceived(CallbackFunction f)
+    {
+        on_input = f;
+    }
     /**
      * @brief Atualiza o estado da conexão Telnet e gerencia entradas seriais.
      */
@@ -32,13 +39,13 @@ protected:
      * @param baudrate Taxa de transmissão para comunicação serial (padrão: BAUD_RATE).
      * @return true se a inicialização foi bem-sucedida, false caso contrário.
      */
-    bool start(uint16_t port, unsigned long baudrate = BAUD_RATE);
+    void start(unsigned long baudrate = BAUD_RATE);
 
 public:
     /**
      * @brief Construtor da classe.
      */
-    WSerial_c() : ESPTelnet() {}
+    WSerial_c() {}
 
     /**
      * @brief Envia dados para um gráfico utilizando x e y.
@@ -107,18 +114,6 @@ public:
     void println();
 
     /**
-     * @brief Obtém a porta do servidor Telnet.
-     * @return Porta do servidor.
-     */
-    uint16_t serverPort() { return (this->server_port); }
-
-    /**
-     * @brief Verifica se a conexão Telnet está ativa.
-     * @return true se conectado, false caso contrário.
-     */
-    bool isConnected();
-
-    /**
      * @brief Função amiga para inicializar a conexão Telnet.
      *
      * @param ws Ponteiro para a instância de WSerial_c.
@@ -126,7 +121,7 @@ public:
      * @param baudrate Taxa de transmissão para comunicação serial.
      * @return true se a inicialização foi bem-sucedida, false caso contrário.
      */
-    friend inline bool startWSerial(WSerial_c *ws, uint16_t port, unsigned long baudrate);
+    friend inline void startWSerial(WSerial_c *ws, unsigned long baudrate);
 
     /**
      * @brief Função amiga para atualizar a conexão Telnet.
@@ -135,65 +130,46 @@ public:
     friend inline void updateWSerial(WSerial_c *ws);
 };
 
-inline bool WSerial_c::isConnected() {
-    return ((ESPTelnet *) this)->isConnected();
+inline void startWSerial(WSerial_c *ws, unsigned long baudrate)
+{
+    return (ws->start(baudrate));
 }
 
-inline bool startWSerial(WSerial_c *ws, uint16_t port, unsigned long baudrate) {
-    return(ws->start(port, baudrate));
+void WSerial_c::start(unsigned long baudrate)
+{
+    Serial.begin(baudrate);
 }
 
-bool WSerial_c::start(uint16_t port, unsigned long baudrate) {
-    if (isConnected()) {
-        ((ESPTelnet *) this)->stop();
-    }
-    server_port = port;
-    onDisconnect([](String ip) {
-        Serial.print("- Telnet: ");
-        Serial.print(ip);
-        Serial.println(" disconnected");
-    });
-    onConnectionAttempt([](String ip) {
-        Serial.print("- Telnet: ");
-        Serial.print(ip);
-        Serial.println(" tried to connected");
-    });
-    onReconnect([](String ip) {
-        Serial.print("- Telnet: ");
-        Serial.print(ip);
-        Serial.println(" reconnected");
-    });
-
-    return (((ESPTelnet *) this)->begin(server_port));
-}
-
-inline void updateWSerial(WSerial_c *ws) {
+inline void updateWSerial(WSerial_c *ws)
+{
     ws->update();
 }
 
-void WSerial_c::update(void) {
-    if (isConnected()) {
-        if (Serial.available() && on_input != NULL) {
-            on_input(Serial.readStringUntil('\n'));
-        }
+void WSerial_c::update(void)
+{
+    if (Serial.available() && on_input != NULL)
+    {
+        on_input(Serial.readStringUntil('\n'));
     }
-    ((ESPTelnet *) this)->loop();
 }
 
 template <typename T>
-void WSerial_c::plot(const char *varName, T y, const char *unit) {
+void WSerial_c::plot(const char *varName, T y, const char *unit)
+{
     plot(varName, (T)millis(), y, unit);
 }
 
 template <typename T>
-void WSerial_c::plot(const char *varName, T x, T y, const char *unit) {
+void WSerial_c::plot(const char *varName, T x, T y, const char *unit)
+{
     print(">");
     print(varName);
     print(":");
     print(x);
     print(":");
     print(y);
-    if (unit != NULL) {
+    if (unit != NULL)
+    {
         print("\u00a7");
         print(unit);
     }
@@ -201,47 +177,34 @@ void WSerial_c::plot(const char *varName, T x, T y, const char *unit) {
 }
 
 template <typename T>
-void WSerial_c::print(const T &data) {
-    if (((ESPTelnet *) this)->isConnected()) {
-        ((ESPTelnet *) this)->print(data);
-    } else {
-        Serial.print(data);
-    }
+void WSerial_c::print(const T &data)
+{
+    Serial.print(data);
 }
 
 template <typename T>
-void WSerial_c::print(const T &data, int base) {
-    if (((ESPTelnet *) this)->isConnected()) {
-        ((ESPTelnet *) this)->print(data, base);
-    } else {
-        Serial.print(data, base);
-    }
+void WSerial_c::print(const T &data, int base)
+{
+    Serial.print(data, base);
 }
 
 template <typename T>
-void WSerial_c::println(const T &data) {
-    if (((ESPTelnet *) this)->isConnected()) {
-        ((ESPTelnet *) this)->println(data);
-    } else {
-        Serial.println(data);
-    }
+void WSerial_c::println(const T &data)
+{
+
+    Serial.println(data);
 }
 
 template <typename T>
-void WSerial_c::println(const T &data, int base) {
-    if (((ESPTelnet *) this)->isConnected()) {
-        ((ESPTelnet *) this)->println(data, base);
-    } else {
-        Serial.println(data, base);
-    }
+void WSerial_c::println(const T &data, int base)
+{
+
+    Serial.println(data, base);
 }
 
-void WSerial_c::println() {
-    if (((ESPTelnet *) this)->isConnected()) {
-        ((ESPTelnet *) this)->println();
-    } else {
-        Serial.println();
-    }
+void WSerial_c::println()
+{
+    Serial.println();
 }
 
 #endif
