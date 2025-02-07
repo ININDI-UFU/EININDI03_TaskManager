@@ -90,6 +90,7 @@ public:
 
 inline void IIKitmini_c::setup()
 {
+    startWSerial(&WSerial, 4000, 115200UL);  
     WSerial.println("Booting");
     hart.setup(&WSerial);
     /********** Inicializando Display ***********/
@@ -98,16 +99,12 @@ inline void IIKitmini_c::setup()
         disp.setText(1, "Inicializando...");
         WSerial.println("Display running");
     }
-
     delay(50);
-
     /********** Configurando Wi-Fi ***********/
     disp.setFuncMode(false);
     disp.setText(1, "Mode: sem WIFI", false);
-
     /********** Inicializando Telnet ***********/
     startWSerial(&WSerial, 115200);
-
     /********** Configurando GPIOs ***********/
     pinMode(def_pin_RTN1, INPUT_PULLDOWN);
     pinMode(def_pin_RTN2, INPUT_PULLDOWN);
@@ -122,7 +119,6 @@ inline void IIKitmini_c::setup()
     pinMode(def_pin_ADC1, ANALOG);
     pinMode(def_pin_RELE, OUTPUT);
     pinMode(def_pin_W4a20_1, OUTPUT);
-
     digitalWrite(def_pin_D1, LOW);
     digitalWrite(def_pin_D2, LOW);        
     digitalWrite(def_pin_D3, LOW);
@@ -131,7 +127,6 @@ inline void IIKitmini_c::setup()
     analogWrite(def_pin_PWM, 0);
     analogWrite(def_pin_DAC1, 0);
     analogWrite(def_pin_W4a20_1, 0);
-
     ads.begin();
 }
 

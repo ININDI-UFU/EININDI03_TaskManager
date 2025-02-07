@@ -71,10 +71,10 @@ private:
     void errorMsg(String error, bool restart = true);
 
 public:
-    DigitalDebounce  rtn_1;       ///< Botão de retorno 1.
-    DigitalDebounce  rtn_2;       ///< Botão de retorno 2.
-    DigitalDebounce  push_1;      ///< Botão push 1.
-    DigitalDebounce  push_2;      ///< Botão push 2.
+    DigitalINDebounce  rtn_1;       ///< Botão de retorno 1.
+    DigitalINDebounce  rtn_2;       ///< Botão de retorno 2.
+    DigitalINDebounce  push_1;      ///< Botão push 1.
+    DigitalINDebounce  push_2;      ///< Botão push 2.
     Display_c disp;    ///< Display OLED.
     WSerial_c WSerial; ///< Conexão Telnet e Serial.
 
@@ -115,6 +115,15 @@ public:
 
 inline void IIKit_c::setup()
 {
+    /********** Inicializando EEPROM ***********/
+    EEPROM.begin(1);
+    char idKit[2] = "3";
+    // EEPROM.write(0, (uint8_t)idKit[0]);
+    // EEPROM.commit();
+    idKit[0] = (char)EEPROM.read(0);
+    strcat(DDNSName, idKit);    
+    /********** Inicializando Telnet ***********/
+    startWSerial(&WSerial, 4000 + String(idKit[0]).toInt(), 115200);    
     WSerial.println("Booting");
     hart.setup(&WSerial);
     /********** Inicializando Display ***********/
@@ -129,15 +138,6 @@ inline void IIKit_c::setup()
     }
 
     delay(50);
-
-    /********** Inicializando EEPROM ***********/
-    EEPROM.begin(1);
-    char idKit[2] = "3";
-    // EEPROM.write(0, (uint8_t)idKit[0]);
-    // EEPROM.commit();
-    idKit[0] = (char)EEPROM.read(0);
-    strcat(DDNSName, idKit);
-
     /********** Configurando Wi-Fi ***********/
     WiFi.mode(WIFI_STA);
     wm.start(&WSerial);
@@ -165,9 +165,6 @@ inline void IIKit_c::setup()
 
     /********** Inicializando OTA ***********/
     OTA::start(DDNSName);
-
-    /********** Inicializando Telnet ***********/
-    startWSerial(&WSerial, 4000 + String(idKit[0]).toInt(), 115200);
 
     /********** Configurando GPIOs ***********/
     pinMode(def_pin_RTN1, INPUT_PULLDOWN);
