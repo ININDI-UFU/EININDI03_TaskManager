@@ -10,6 +10,7 @@
 #define __WSERIAL_H
 
 #include <Arduino.h>
+#include "ESPTelnet.h"
 
 #define BAUD_RATE 115200 ///< Taxa de transmissão padrão para comunicação serial.
 

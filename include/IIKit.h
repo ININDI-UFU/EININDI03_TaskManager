@@ -19,18 +19,18 @@
 #include "services/WSerial_c.h"
 #include "services/display_c.h"
 #include "services/wifimanager_c.h"
-
-#include "util/asyncDelay.h"
-#include "util/DebouncedInput.h"
 #include "services/ads1115_c.h"
 #include "services/hart_c.h"
 
-#define def_pin_RTN1 39    ///< GPIO para botão retentivo 1.
-#define def_pin_RTN2 36    ///< GPIO para botão retentivo 2.
-#define def_pin_PUSH1 35   ///< GPIO para botão push 1.
-#define def_pin_PUSH2 34    ///< GPIO para botão push 2.
+#include "util/asyncDelay.h"
+#include "util/dinDebounce.h"
+
+/********** GPIO DEFINITIONS ***********/
+#define def_pin_ADC1 39    ///< GPIO para entrada ADC1.
+#define def_pin_RTN2 35    ///< GPIO para botão retentivo 2.
+#define def_pin_PUSH1 34   ///< GPIO para botão push 1.
 #define def_pin_PWM 33     ///< GPIO para saída PWM.
-#define def_pin_ADC1 32    ///< GPIO para entrada ADC1.
+#define def_pin_PUSH2 32    ///< GPIO para botão push 2.
 #define def_pin_RELE 27    ///< GPIO para relé.
 #define def_pin_W4a20_1 26 ///< GPIO para saída 4-20mA 1.
 #define def_pin_DAC1 25    ///< GPIO para saída DAC1.
@@ -45,9 +45,11 @@
 ///< GPIO12 - ESP_PROG_TDI:8
 #define def_pin_D4 4      ///< GPIO para I/O digital 4.
 ///< GPIO3  - ESP_COM_TX:3
+#define def_pin_RTN1 2    ///< GPIO para botão retentivo 1.
 ///< GPIO1  - ESP_COM_RX:5
 ///< GPIO0  - ESP_COM_BOOT:6
 ///< ESPEN  - ESP_COM_EN:1
+
 
 /**
  * @class IIKit_c
@@ -69,10 +71,10 @@ private:
     void errorMsg(String error, bool restart = true);
 
 public:
-    DebouncedInput  rtn_1;       ///< Botão de retorno 1.
-    DebouncedInput  rtn_2;       ///< Botão de retorno 2.
-    DebouncedInput  push_1;      ///< Botão push 1.
-    DebouncedInput  push_2;      ///< Botão push 2.
+    DigitalDebounce  rtn_1;       ///< Botão de retorno 1.
+    DigitalDebounce  rtn_2;       ///< Botão de retorno 2.
+    DigitalDebounce  push_1;      ///< Botão push 1.
+    DigitalDebounce  push_2;      ///< Botão push 2.
     Display_c disp;    ///< Display OLED.
     WSerial_c WSerial; ///< Conexão Telnet e Serial.
 
@@ -182,10 +184,10 @@ inline void IIKit_c::setup()
     pinMode(def_pin_RELE, OUTPUT);
     pinMode(def_pin_W4a20_1, OUTPUT);
 
-    rtn_1.setup(def_pin_RTN1, FALLING, 50000UL);
-    rtn_2.setup(def_pin_RTN2, FALLING, 50000UL);
-    push_1.setup(def_pin_PUSH1, FALLING, 50000UL);
-    push_2.setup(def_pin_PUSH2, FALLING, 50000UL);
+    rtn_1.setup(def_pin_RTN1, 50);
+    rtn_2.setup(def_pin_RTN2, 50);
+    push_1.setup(def_pin_PUSH1, 50);
+    push_2.setup(def_pin_PUSH2, 50);
 
     digitalWrite(def_pin_D1, LOW);
     digitalWrite(def_pin_D2, LOW);        

@@ -12,7 +12,6 @@
 
 #include "services/display_c.h"
 #include "services/ads1115_c.h"
-#include "util/din.h"
 #include "services/hart_c.h"
 
 /********** GPIO DEFINITIONS ***********/
