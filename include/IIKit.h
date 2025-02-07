@@ -122,7 +122,7 @@ inline void IIKit_c::setup()
     // EEPROM.commit();
     idKit[0] = (char)EEPROM.read(0);
     strcat(DDNSName, idKit);    
-    /********** Inicializando Telnet ***********/
+    /****** Inicializando Telnet|Serial***********/
     startWSerial(&WSerial, 4000 + String(idKit[0]).toInt(), 115200);    
     WSerial.println("Booting");
     hart.setup(&WSerial);

@@ -90,6 +90,7 @@ public:
 
 inline void IIKitmini_c::setup()
 {
+    /****** Inicializando Telnet|Serial***********/
     startWSerial(&WSerial, 4000, 115200UL);  
     WSerial.println("Booting");
     hart.setup(&WSerial);
@@ -103,8 +104,6 @@ inline void IIKitmini_c::setup()
     /********** Configurando Wi-Fi ***********/
     disp.setFuncMode(false);
     disp.setText(1, "Mode: sem WIFI", false);
-    /********** Inicializando Telnet ***********/
-    startWSerial(&WSerial, 115200);
     /********** Configurando GPIOs ***********/
     pinMode(def_pin_RTN1, INPUT_PULLDOWN);
     pinMode(def_pin_RTN2, INPUT_PULLDOWN);

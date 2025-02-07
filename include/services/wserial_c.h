@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "ESPTelnet.h"
 
-#define BAUD_RATE 115200
+#define BAUD_RATE 115200UL
 class WSerial_c : public ESPTelnet
 {
 protected: 
