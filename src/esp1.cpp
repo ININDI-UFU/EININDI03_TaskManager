@@ -1,5 +1,5 @@
-#include "IIKit.h"
-#include <Arduino.h>
+#include "IIKitmini.h"
+#include "util/asyncDelay.h"
 
 AsyncDelay_c blinkLED(500); // time mili second
 void blinkLEDFunc(uint8_t pin) {
