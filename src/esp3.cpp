@@ -13,20 +13,13 @@ void blinkLEDFunc(uint8_t pin) {
 void managerInputFunc(void) {
     const uint16_t vlPOT1 = IIKit.analogReadPot1();
     const uint16_t vlPOT2 = IIKit.analogReadPot2();
-    const uint16_t vlR4a20_1 = IIKit.analogRead4a20_1();
-    const uint16_t vlR4a20_2 = IIKit.analogRead4a20_2();
-
     IIKit.disp.setText(2, ("P1:" + String(vlPOT1) + "  P2:" + String(vlPOT2)).c_str());
-    IIKit.disp.setText(3, ("T1:" + String(vlR4a20_1) + "  T2:" + String(vlR4a20_2)).c_str());
-
     IIKit.WSerial.plot("vlPOT1", vlPOT1);
     IIKit.WSerial.plot("vlPOT2", vlPOT2);
-    IIKit.WSerial.plot("vlR4a20_1", vlR4a20_1);
-    IIKit.WSerial.plot("vlR4a20_2", vlR4a20_2);
 }
 
-//DigitalDebounce RTN1(def_pin_RTN1, 50, [](bool state){digitalWrite(def_pin_D1, state);});
-//DigitalDebounce RTN2(def_pin_RTN2, 50, [](bool state){digitalWrite(def_pin_D2, state);});
+//DigitalINDebounce RTN1(def_pin_RTN1, 50, [](bool state){digitalWrite(def_pin_D1, state);});
+//DigitalINDebounce RTN2(def_pin_RTN2, 50, [](bool state){digitalWrite(def_pin_D2, state);});
 DigitalINDebounce PUSH1(def_pin_PUSH1, 50, [](bool state){digitalWrite(def_pin_D3, state);});
 DigitalINDebounce PUSH2(def_pin_PUSH2, 50, [](bool state){digitalWrite(def_pin_D4, state);});
 
