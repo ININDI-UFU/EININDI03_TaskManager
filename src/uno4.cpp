@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#define MAXLENGTHJQUEUE 1024
 #define NUMTASKS 2
 #include "util/jtask.h"
 
@@ -35,7 +34,7 @@ void blinkLEDFunc() {
 void setup() {
     Serial.begin(115200);    
     pinMode(PINLED, OUTPUT);
-    jtaskSetup();    // Configura o timer para 1000 Hz (1 ms)
+
     jtaskAttachFunc(escreve_serial, 50); //anexa um função e sua base de tempo para ser executada
     jtaskAttachFunc(blinkLEDFunc, 500);  //anexa um função e sua base de tempo para ser executada
 }

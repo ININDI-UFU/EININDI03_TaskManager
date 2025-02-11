@@ -1,6 +1,6 @@
 //https://docs.espressif.com/projects/arduino-esp32/en/latest/api/timer.html
 #include "IIKitmini.h"   // Biblioteca base do framework Arduino, necessária para funções básicas como Serial e delays.
-#define NUMTASKS 5
+#define NUMTASKS 3
 #include "util/jtask.h"
 #include "util/dinDebounce.h"
 
@@ -34,11 +34,9 @@ DigitalINDebounce PUSH2(def_pin_PUSH2, 50, [](bool state){digitalWrite(def_pin_D
 void setup() {
     // Faz as configuções do hardware ESP + Perifericos
     IIKit.setup();
-    jtaskSetup();    // Configura o timer para 1000 Hz (1 ms)
     jtaskAttachFunc(managerInputFunc, 50000UL); //anexa um função e sua base de tempo para ser executada
     jtaskAttachFunc([](){blinkLEDFunc(def_pin_D1);}, 500000UL);  //anexa um função e sua base de tempo para ser executada
     jtaskAttachFunc([](){blinkLEDFunc(def_pin_D2);}, 1000000UL);  //anexa um função e sua base de tempo para ser executada
-    //jtaskAttachFunc([](){blinkLEDFunc(def_pin_D3);}, 1500000UL);  //anexa um função e sua base de tempo para ser executada
 }
 
 // Loop principal
