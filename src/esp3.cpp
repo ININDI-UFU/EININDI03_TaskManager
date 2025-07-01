@@ -13,7 +13,8 @@ void blinkLEDFunc(uint8_t pin) {
 void managerInputFunc(void) {
     const uint16_t vlPOT1 = analogRead(def_pin_ADC1);
     const uint16_t vlPOT2 = analogRead(def_pin_ADC2);
-    IIKit.disp.setText(2, ("P1:" + String(vlPOT1) + "  P2:" + String(vlPOT2)).c_str());
+    IIKit.disp.setText(2, ("P1:" + String(vlPOT1)).c_str());
+    IIKit.disp.setText(3, ("P2:" + String(vlPOT2)).c_str());    
     IIKit.WSerial.plot("vlPOT1", vlPOT1);
     IIKit.WSerial.plot("vlPOT2", vlPOT2);
 }
@@ -23,18 +24,18 @@ void managerInputFunc(void) {
 DigitalINDebounce PUSH1(def_pin_PUSH1, 50, [](bool state){digitalWrite(def_pin_D3, state);});
 DigitalINDebounce PUSH2(def_pin_PUSH2, 50, [](bool state){digitalWrite(def_pin_D4, state);});
 
-// Configuração inicial do programa
+//Configuração inicial do programa
 void setup() {
-    // Faz as configuções do hardware ESP + Perifericos
+    //Faz as configuções do hardware ESP + Perifericos
     IIKit.setup();
     jtaskAttachFunc(managerInputFunc, 50000UL); //anexa um função e sua base de tempo para ser executada
     jtaskAttachFunc([](){blinkLEDFunc(def_pin_D1);}, 500000UL);  //anexa um função e sua base de tempo para ser executada
     jtaskAttachFunc([](){blinkLEDFunc(def_pin_D2);}, 1000000UL);  //anexa um função e sua base de tempo para ser executada
 }
 
-// Loop principal
+//Loop principal
 void loop() {
-  // Monitora os perifericos
+  //Monitora os perifericos
   IIKit.loop();
   jtaskLoop();
   //RTN1.update();  // Atualiza a leitura com debounce
