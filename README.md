@@ -41,39 +41,7 @@ O gerenciamento eficiente de tarefas em sistemas embarcados é uma habilidade fu
 
 ---
 
-### Código 2: Introdução de Fila e Timer
-**Descrição:** Neste estágio, filas e timers são introduzidos para melhor gerenciamento das tarefas. Um sistema de filas do FreeRTOS é utilizado para comunicação entre tarefas.
-
-**Prós:**
-- Melhor gerenciamento do fluxo de dados.
-- Utilização de timers para precisão no controle de tempo.
-- Redução de complexidade no loop principal.
-
-**Contras:**
-- Aumento da complexidade na configuração inicial.
-- Possível overhead de desempenho dependendo do número de tarefas.
-
-**Código:** [esp2.cpp](./src/esp2.cpp)
-
----
-
-### Código 3: Estruturação com Estruturas de Dados
-**Descrição:** A arquitetura evolui com a introdução de estruturas de dados, permitindo a parametrização de tarefas e maior organização do código.
-
-**Prós:**
-- Código mais legível e organizado.
-- Escalabilidade melhorada.
-- Parametrização facilita a reutilização de partes do código.
-
-**Contras:**
-- Necessidade de maior atenção na manipulação das estruturas.
-- Depuração pode ser mais complexa.
-
-**Código:** [esp3.cpp](./src/esp3.cpp)
-
----
-
-### Código 4: Generalização com Abstrações
+### Código 2: Generalização com Abstrações
 **Descrição:** Neste último estágio, uma abstração completa é implementada, permitindo que o código suporte novas funcionalidades e configurações de forma simples.
 
 **Prós:**
@@ -85,15 +53,15 @@ O gerenciamento eficiente de tarefas em sistemas embarcados é uma habilidade fu
 - Complexidade inicial na implementação.
 - Maior curva de aprendizado para novos desenvolvedores no projeto.
 
-**Código:** [esp4.cpp](./src/esp4.cpp)
+**Código:** [esp2.cpp](./src/esp2.cpp)
 
 ---
 
 ## Tarefa a ser executada:
 
 - Execute cada um dos códigos,
-- Crie um novo arquivo **esp5.cpp** na pasta **./src**,
-- Copie o código **esp4.cpp** no arquivo **esp5.cpp**,
+- Crie um novo arquivo **esp3.cpp** na pasta **./src**,
+- Copie o código **esp2.cpp** no arquivo **esp3.cpp**,
 - Faça um função que lê um valor na entrada analogica **def_pin_ADC1** e escreve na serial
 - Faça as ligações necessárias e veja se o código esta funcionando corretamente usando o **teleplot**.
 
@@ -106,5 +74,3 @@ A evolução apresentada neste repositório demonstra como a introdução de abs
 ## Links dos Códigos
 - [Código 1: Gerenciamento Rudimentar](./src/esp1.cpp)
 - [Código 2: Introdução de Fila e Timer](./src/esp2.cpp)
-- [Código 3: Estruturação com Estruturas de Dados](./src/esp3.cpp)
-- [Código 4: Generalização com Abstrações](./src/esp4.cpp)
