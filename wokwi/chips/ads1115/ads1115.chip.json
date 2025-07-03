@@ -1,0 +1,23 @@
+{
+  "name": "ads1115",
+  "author": "Prof. Josué Morais - UFU",
+  "pins": [
+    "VCC",
+    "GND",
+    "SDA",
+    "SCL",
+    "AIN0",
+    "AIN1",
+    "AIN2",
+    "AIN3"
+  ],
+  "controls": [
+    {
+      "id": "ppm",
+      "label": "PPM",
+      "type": "slider",
+      "min": 10,
+      "max": 1000
+    }
+  ]
+}

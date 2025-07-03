@@ -1,0 +1,5 @@
+{
+  "name": "opamp",
+  "author": "Prof. Josué Morais - UFU",
+  "pins": ["IN+","IN-","OUT"]
+}

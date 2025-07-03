@@ -55,6 +55,7 @@
         "condition_variable": "cpp",
         "ratio": "cpp",
         "mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "wokwi-api.h": "c"
     }
 }

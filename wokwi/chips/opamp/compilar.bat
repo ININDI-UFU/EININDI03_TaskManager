@@ -1,0 +1,1 @@
+emcc opamp.chip.c -o opamp.chip.wasm -s EXPORT_ALL=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0
