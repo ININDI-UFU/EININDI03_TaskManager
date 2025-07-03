@@ -6,14 +6,14 @@ gdbServerPort = 3333
 rfc2217ServerPort = 4000
 
 # Seção para o ADS1115
-[[chip]]
-name = 'ads1115'
-binary = 'chips/ads1115/ads1115.chip.wasm'
+# [[chip]]
+# name = 'ads1115'
+# binary = 'chips/ads1115/ads1115.chip.wasm'
 
 # Seção para o Op-Amp customizado
-[[chip]]
-name   = "opamp"
-binary = "chips/opamp/opamp.chip.wasm"
+# [[chip]]
+# name   = "opamp"
+# binary = "chips/opamp/opamp.chip.wasm"
 
 [[net.forward]]
 from = "localhost:23"

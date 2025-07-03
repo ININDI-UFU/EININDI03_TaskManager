@@ -105,7 +105,10 @@
     [ "esp:34", "btn2:2.l", "green", [ "h-38.25", "v220.8", "h278.4", "v-38.4" ] ],
     [ "btn2:2.r", "esp:3V3", "red", [ "h19.4", "v-259", "h-364.8" ] ],
     [ "btn1:2.r", "btn2:2.r", "red", [ "h19.4", "v-47.8" ] ],
-    [ "btn1:2.l", "esp:32", "green", [ "h-336", "v9.8" ] ]
+    [ "btn1:2.l", "esp:32", "green", [ "h-336", "v9.8" ] ],
+    [ "pot2:SIG", "esp:VN", "green", [ "v0" ] ],
+    [ "pot2:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "pot1:SIG", "esp:VP", "green", [ "v0" ] ]
   ],
   "dependencies": {}
 }
