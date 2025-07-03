@@ -1,1 +1,0 @@
-Call pip install --upgrade pyserial
