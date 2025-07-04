@@ -5,16 +5,6 @@ firmware = "../.pio/build/esp32/firmware.bin"
 gdbServerPort = 3333
 rfc2217ServerPort = 4000
 
-# Seção para o ADS1115
-# [[chip]]
-# name = 'ads1115'
-# binary = 'chips/ads1115/ads1115.chip.wasm'
-
-# Seção para o Op-Amp customizado
-# [[chip]]
-# name   = "opamp"
-# binary = "chips/opamp/opamp.chip.wasm"
-
 [[net.forward]]
 from = "localhost:23"
 to = "target:23"
