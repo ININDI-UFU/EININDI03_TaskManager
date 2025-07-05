@@ -1,23 +1,28 @@
 {
   "name": "ads1115",
   "author": "Prof. Josué Morais - UFU",
+  "license": "MIT",
+  "docs": "https://github.com/josuemoraisgh/Wokwi-Chip-ads1115/blob/main/docs/README.md",
   "pins": [
     "VCC",
     "GND",
-    "SDA",
     "SCL",
-    "AIN0",
-    "AIN1",
-    "AIN2",
-    "AIN3"
+    "SDA",
+    "ADDR",
+    "ALRT",
+    "A0",
+    "A1",
+    "A2",
+    "A3",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
   ],
-  "controls": [
-    {
-      "id": "ppm",
-      "label": "PPM",
-      "type": "slider",
-      "min": 10,
-      "max": 1000
-    }
-  ]
+  "controls": []
 }

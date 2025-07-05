@@ -123,5 +123,5 @@
     [ "pot3:GND", "esp:GND.2", "black", [ "v0", "h-192" ] ],
     [ "pot4:GND", "esp:GND.2", "black", [ "v9.6", "h-316.8" ] ]
   ],
-  "dependencies": { "chip-ads1115": "github:josuemoraisgh/Wokwi-Chip-ads1115@v0.0.2" }
+  "dependencies": { "chip-ads1115": "github:josuemoraisgh/Wokwi-Chip-ads1115@v0.0.3" }
 }

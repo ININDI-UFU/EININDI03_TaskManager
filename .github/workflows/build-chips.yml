@@ -1,0 +1,28 @@
+name: Build All Chips
+
+on:
+  push:
+    paths:
+      - 'chips/**'
+      - '.github/workflows/**'
+
+jobs:
+  build-chips:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Find and Build All Chip C Files
+        run: |
+          for chip_path in chips/*; do
+            chip_name=$(basename "$chip_path")
+            chip_c_file="$chip_path/$chip_name.chip.c"
+            if [ -f "$chip_c_file" ]; then
+              echo "Compiling $chip_c_file..."
+              clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all -o "$chip_path/$chip_name.chip.wasm" "$chip_c_file"
+            else
+              echo "No .chip.c file found for $chip_name"
+            fi
+          done
