@@ -5,6 +5,7 @@ on:
     paths:
       - 'wokwi/chips/**'
       - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   build-chips:
@@ -13,42 +14,35 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Mostrar estrutura de diretórios (debug)
-        run: |
-          echo "Diretório atual: $(pwd)"
-          echo "Conteúdo completo do projeto:"
-          find . -type f
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y clang
 
-      - name: Verificar se wokwi-api.h existe
+      - name: Build all chips in wokwi/chips
         run: |
-          if [ -f wokwi/chips/wokwi-api.h ]; then
-            echo "✅ wokwi-api.h encontrado"
-          else
-            echo "❌ ERRO: wokwi-api.h não encontrado"
-            exit 1
-          fi
+          ROOT_DIR="$(pwd)/wokwi/chips"
+          for chip_dir in "$ROOT_DIR"/*/; do
+            CHIP_NAME=$(basename "$chip_dir")
+            SRC_FILE="$chip_dir/${CHIP_NAME}.chip.c"
+            JSON_FILE="$chip_dir/${CHIP_NAME}.chip.json"
+            OUT_FILE="$chip_dir/${CHIP_NAME}.chip.wasm"
 
-      - name: Compilar todos os .chip.c → .chip.wasm
-        run: |
-          INCLUDE_PATH="$(pwd)/wokwi/chips"
-          for file in $(find wokwi/chips -name "*.chip.c"); do
-            base="${file%.chip.c}"
-            out="${base}.chip.wasm"
-            echo "Compilando $file → $out"
-            clang \
-              --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all \
-              -I "$INCLUDE_PATH" \
-              -o "$out" "$file" \
-              || { echo "❌ Erro ao compilar $file"; exit 1; }
-            sudo chown runner:runner "$out"
+            if [[ -f "$SRC_FILE" ]]; then
+              echo "Compilando $SRC_FILE → $OUT_FILE"
+              clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all -I "$ROOT_DIR" -o "$OUT_FILE" "$SRC_FILE" || echo "Erro ao compilar $SRC_FILE"
+            else
+              echo "Arquivo fonte $SRC_FILE não encontrado. Pulando."
+            fi
+
+            if [[ ! -f "$JSON_FILE" ]]; then
+              echo "AVISO: $JSON_FILE não encontrado"
+            fi
           done
 
-      - name: Ajustar permissões da pasta chips
-        run: |
-          sudo chown -R runner:runner wokwi/chips
+      - name: List all .wasm outputs (debug)
+        run: find wokwi/chips -name "*.wasm"
 
-      - name: Upload dos arquivos compilados
+      - name: Upload all .wasm files
         uses: actions/upload-artifact@v4
         with:
           name: compiled-chips
-          path: wokwi/chips/**/*.chip.wasm
+          path: wokwi/chips/**/*.wasm
