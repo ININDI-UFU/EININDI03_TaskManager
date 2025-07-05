@@ -14,7 +14,7 @@ typedef struct {
   uint8_t config_buffer[2];
   uint8_t config_index;
   uint16_t conversion_value;
-  attr_t analog_inputs[4]; // AIN0 - AIN3
+  uint32_t analog_inputs[4];// AIN0 - AIN3
 } chip_state_t;
 
 static chip_state_t chip;
