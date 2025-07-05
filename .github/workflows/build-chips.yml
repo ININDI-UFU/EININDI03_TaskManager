@@ -5,31 +5,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-chips:
-    name: Build ${{ matrix.chip }}
+  build-all-chips:
+    name: Build All Chips
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        chip: [ads1115, bh1750, opamp]  # Adicione os chips que tiver na pasta wokwi/chips
+        chip: [ads1115, bh1750, opamp] # adicione mais chips aqui conforme necessário
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build chip ${{ matrix.chip }}
+      - name: Build chip - ${{ matrix.chip }}
         uses: wokwi/wokwi-chip-clang-action@main
         with:
           sources: wokwi/chips/${{ matrix.chip }}/src/main.c
           chip-json: wokwi/chips/${{ matrix.chip }}/chip.json
 
-      - name: Organize output files
+      - name: Fix permissions and move compiled files
         run: |
-          mkdir -p wokwi/chips/${{ matrix.chip }}/dist
-          mv dist/chip.wasm wokwi/chips/${{ matrix.chip }}/dist/${{ matrix.chip }}.chip.wasm
-          mv dist/chip.json wokwi/chips/${{ matrix.chip }}/dist/${{ matrix.chip }}.chip.json
+          CHIP_ID=${{ matrix.chip }}
+          sudo chown -R runner:runner dist
+          mkdir -p wokwi/chips/$CHIP_ID/dist
+          mv dist/chip.wasm "wokwi/chips/$CHIP_ID/dist/${CHIP_ID}.chip.wasm"
+          mv chip.json "wokwi/chips/$CHIP_ID/dist/${CHIP_ID}.chip.json"
 
-      - name: Upload artifacts for ${{ matrix.chip }}
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: chip-${{ matrix.chip }}
-          path: wokwi/chips/${{ matrix.chip }}/dist/
+          name: ${{ matrix.chip }}
+          path: |
+            wokwi/chips/${{ matrix.chip }}/dist/${{ matrix.chip }}.chip.wasm
+            wokwi/chips/${{ matrix.chip }}/dist/${{ matrix.chip }}.chip.json
