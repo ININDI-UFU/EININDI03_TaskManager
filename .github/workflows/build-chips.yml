@@ -1,47 +1,49 @@
-name: Build All Chips
+name: Build All Custom Chips
 
 on:
   push:
-    paths:
-      - 'wokwi/chips/**'
-      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
-  build-chips:
+  build-all-chips:
     runs-on: ubuntu-22.04
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build all chips
+      - name: Compile each chip in wokwi/chips/*
+        shell: bash
         run: |
-          ROOT_DIR="wokwi/chips"
-          for chip_dir in "$ROOT_DIR"/*/; do
-            CHIP_NAME=$(basename "$chip_dir")
-            CHIP_C="$chip_dir/${CHIP_NAME}.chip.c"
-            CHIP_JSON="$chip_dir/${CHIP_NAME}.chip.json"
-            DIST_DIR="$chip_dir/dist"
-            WASM_FILE="${DIST_DIR}/${CHIP_NAME}.chip.wasm"
-
-            echo "→ Compilando $CHIP_NAME"
-            mkdir -p "$DIST_DIR"
-
-            if [ -f "$CHIP_C" ] && [ -f "$CHIP_JSON" ]; then
-              clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all \
-                -I "$ROOT_DIR" -o "$WASM_FILE" "$CHIP_C"
-              cp "$CHIP_JSON" "$DIST_DIR/"
-              echo "✔️  $CHIP_NAME compilado com sucesso!"
+          for dir in wokwi/chips/*/; do
+            chip_name=$(basename "$dir")
+            echo "🔧 Compilando chip: $chip_name"
+            
+            # Define caminhos
+            chip_c="$dir/${chip_name}.chip.c"
+            chip_json="$dir/${chip_name}.chip.json"
+            wasm_out="$dir/${chip_name}.chip.wasm"
+            
+            # Compilar
+            if [ -f "$chip_c" ]; then
+              echo "📦 Compilando $chip_c → $wasm_out"
+              wokwi/wokwi-chip-clang-action@main \
+                --sources "$chip_c" \
+                --output "$wasm_out"
             else
-              echo "⚠️  Pulando $CHIP_NAME: arquivos .chip.c ou .chip.json ausentes."
+              echo "⚠️ Arquivo $chip_c não encontrado. Pulando..."
+              continue
+            fi
+
+            # Verifica se chip.json existe
+            if [ -f "$chip_json" ]; then
+              echo "✅ JSON encontrado: $chip_json"
+            else
+              echo "⚠️ JSON não encontrado: $chip_json"
             fi
           done
 
-      - name: Upload all artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload todos os .wasm e .json como artefatos
+        uses: actions/upload-artifact@v3
         with:
-          name: compiled-chips
-          path: |
-            wokwi/chips/*/dist/*.chip.wasm
-            wokwi/chips/*/dist/*.chip.json
+          name: all-chips
+          path: wokwi/chips/**/**/*.chip.*
