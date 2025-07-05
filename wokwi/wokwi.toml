@@ -14,7 +14,7 @@ to = "target:23"
 # https://github.com/Dlloydev/Wokwi-Chip-Scope
 [[chip]]
 name = "bh1750"
-binary = "chips/bh1750/bh1750.chip.wasm"
+binary = "chips/bh1750/dist/bh1750.chip.wasm"
 
 # [[chip]]
 # name = "opamp"
