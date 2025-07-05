@@ -1,7 +1,7 @@
 // Wokwi Custom Op-Amp Chip
 // SPDX-License-Identifier: MIT
 
-#include "wokwi-api.h"
+#include "../../wokwi-api.h"
 #include <stdio.h>
 #include <stdlib.h>
 
