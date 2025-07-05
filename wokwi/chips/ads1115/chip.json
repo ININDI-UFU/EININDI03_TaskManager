@@ -4,35 +4,15 @@
   "license": "MIT",
   "docs": "https://github.com/josuemoraisgh/Wokwi-Chip-ads1115/blob/main/docs/README.md",
   "pins": [
-    "VCC",
-    "GND",
-    "SCL",
+    "GND",  
+    "VDD",
+    "SCL",  
     "SDA",
+    "ADDR",
+    "ALERT",
     "AIN0",
     "AIN1",
     "AIN2",
     "AIN3"
-  ],
-  "controls": [
-    {
-      "name": "AIN0",
-      "type": "number",
-      "initialValue": 1000
-    },
-    {
-      "name": "AIN1",
-      "type": "number",
-      "initialValue": 1000
-    },
-    {
-      "name": "AIN2",
-      "type": "number",
-      "initialValue": 1000
-    },
-    {
-      "name": "AIN3",
-      "type": "number",
-      "initialValue": 1000
-    }
   ]
 }

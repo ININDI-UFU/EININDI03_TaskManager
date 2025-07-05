@@ -8,10 +8,10 @@
     "GND",
     "SCL",
     "SDA",
-    "A0",
-    "A1",
-    "A2",
-    "A3"
+    "AIN0",
+    "AIN1",
+    "AIN2",
+    "AIN3"
   ],
   "controls": []
 }
