@@ -11,7 +11,6 @@ typedef struct {
   bool msb;
 } chip_t;
 
-static void     chip_init();
 static bool     on_i2c_connect(void *user_data, uint32_t i2c_index, uint32_t address);
 static bool     on_i2c_write(void *user_data, uint32_t i2c_index, uint8_t data);
 static uint8_t  on_i2c_read(void *user_data, uint32_t i2c_index);
