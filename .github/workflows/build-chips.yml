@@ -11,46 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Mostrar estrutura de diretórios (debug)
-        run: |
-          echo "Diretório atual: $(pwd)"
-          echo "Conteúdo completo do projeto:"
-          find . -type f
+      - name: Debug: Lista de arquivos
+        run: find .
 
-      - name: Verificar se wokwi-api.h existe
-        run: |
-          if [ -f wokwi/chips/wokwi-api.h ]; then
-            echo "✅ wokwi-api.h encontrado"
-          else
-            echo "❌ ERRO: wokwi-api.h não encontrado em wokwi/chips/"
-            exit 1
-          fi
+      - name: Compilar chips com Wokwi Clang
+        uses: wokwi/wokwi-chip-clang-action@main
+        with:
+          sources: |
+            wokwi/chips/bh1750/bh1750.chip.c
+            wokwi/chips/ads1115/ads1115.chip.c
+            # Adicione outros chips conforme a pasta
 
-      - name: Compilar todos os .chip.c → .chip.wasm
-        run: |
-          INCLUDE_PATH="$(pwd)/wokwi/chips"
-          for file in $(find wokwi/chips -name "*.chip.c"); do
-            base="${file%.chip.c}"
-            out="${base}.chip.wasm"
-            echo "Compilando  $file → $out"
-            clang \
-              --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all \
-              -I "$INCLUDE_PATH" \
-              -o "$out" "$file" \
-              || { echo "❌ Erro ao compilar $file"; exit 1; }
-            sudo chown runner:runner "$out"
-          done
+      - name: Ajustar permissões
+        run: sudo chown -R runner:runner wokwi/chips
 
-      - name: Ajustar permissões de pasta chips
-        run: |
-          sudo chown -R runner:runner wokwi/chips
-
-      - name: Upload dos arquivos compilados como artefato
+      - name: Upload artefatos compilados
         uses: actions/upload-artifact@v4
         with:
           name: compiled-chips
-          path: |
-            wokwi/chips/**/*.chip.wasm
+          path: wokwi/chips/**/*.chip.wasm
