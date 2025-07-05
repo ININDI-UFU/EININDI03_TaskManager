@@ -16,31 +16,41 @@ jobs:
 
       - name: Mostrar estrutura de diretórios (debug)
         run: |
-          echo "Diretório atual:"
-          pwd
+          echo "Diretório atual: $(pwd)"
           echo "Conteúdo completo do projeto:"
           find . -type f
 
       - name: Verificar se wokwi-api.h existe
         run: |
           if [ -f wokwi/chips/wokwi-api.h ]; then
-            echo "wokwi-api.h encontrado em wokwi/chips!"
+            echo "✅ wokwi-api.h encontrado"
           else
-            echo "ERRO: wokwi-api.h não encontrado em wokwi/chips/"
+            echo "❌ ERRO: wokwi-api.h não encontrado em wokwi/chips/"
             exit 1
           fi
 
-      - name: Compilar todos os .chip.c → .wasm
+      - name: Compilar todos os .chip.c → .chip.wasm
         run: |
           INCLUDE_PATH="$(pwd)/wokwi/chips"
           for file in $(find wokwi/chips -name "*.chip.c"); do
             base="${file%.chip.c}"
-            echo "Compilando $file → ${base}.chip.wasm"
-            clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all -I "$INCLUDE_PATH" -o "${base}.chip.wasm" "$file" || echo "Erro ao compilar $file"
+            out="${base}.chip.wasm"
+            echo "Compilando  $file → $out"
+            clang \
+              --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all \
+              -I "$INCLUDE_PATH" \
+              -o "$out" "$file" \
+              || { echo "❌ Erro ao compilar $file"; exit 1; }
+            sudo chown runner:runner "$out"
           done
 
-      - name: Upload arquivos .wasm como artefato
+      - name: Ajustar permissões de pasta chips
+        run: |
+          sudo chown -R runner:runner wokwi/chips
+
+      - name: Upload dos arquivos compilados como artefato
         uses: actions/upload-artifact@v4
         with:
           name: compiled-chips
-          path: wokwi/chips/**/*.wasm
+          path: |
+            wokwi/chips/**/*.chip.wasm
