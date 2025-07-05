@@ -1,7 +1,5 @@
-#include "wokwi-api.h"
 #include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#include "wokwi-api.h"
 
 #define I2C_ADDRESS 0x48
 
@@ -12,6 +10,9 @@ typedef struct {
   i2c_config_t i2c_config;      // I2C configuration
 } chip_state_t;
 
+// Instância estática global (em vez de malloc)
+static chip_state_t chip;
+
 // Function prototypes
 void chip_init();
 bool on_i2c_connect(void *user_data, uint32_t address, bool read);
@@ -21,22 +22,19 @@ void simulate_adc_conversion(chip_state_t *chip);
 
 // Initializes the chip
 void chip_init() {
-  chip_state_t *chip = malloc(sizeof(chip_state_t));
-  memset(chip, 0, sizeof(chip_state_t)); // Initialize all values to 0
+  // Inicialização manual dos campos
+  chip.conversion_register = 0;
+  chip.config_register = 0;
 
   // Set up the I2C configuration
-  chip->i2c_config.address = I2C_ADDRESS;
-  chip->i2c_config.scl = pin_init("SCL", INPUT);
-  chip->i2c_config.sda = pin_init("SDA", INPUT);
-  chip->i2c_config.connect = on_i2c_connect;
-  chip->i2c_config.read = on_i2c_read;
-  chip->i2c_config.write = on_i2c_write;
-  chip->i2c_config.user_data = chip;
-  chip->i2c_dev = i2c_init(&(chip->i2c_config));
-
-  // Initialize the ADC registers
-  chip->conversion_register = 0; // Default conversion value
-  chip->config_register = 0;     // Default config
+  chip.i2c_config.address = I2C_ADDRESS;
+  chip.i2c_config.scl = pin_init("SCL", INPUT);
+  chip.i2c_config.sda = pin_init("SDA", INPUT);
+  chip.i2c_config.connect = on_i2c_connect;
+  chip.i2c_config.read = on_i2c_read;
+  chip.i2c_config.write = on_i2c_write;
+  chip.i2c_config.user_data = &chip;
+  chip.i2c_dev = i2c_init(&(chip.i2c_config));
 }
 
 // Handle I2C connect event
@@ -62,7 +60,5 @@ bool on_i2c_write(void *user_data, uint8_t data) {
 // Simulates an ADC conversion
 void simulate_adc_conversion(chip_state_t *chip) {
   // Simple ADC conversion simulation
-  // This should be adapted to simulate analog-to-digital conversion based on the config register
-  // For now, let's just assign a fixed value
   chip->conversion_register = 1234; // Example fixed ADC value
 }
