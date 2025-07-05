@@ -2,47 +2,49 @@ name: Build All Chips
 
 on:
   push:
-    paths:
-      - 'wokwi/chips/**'
-      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
-  build-chips:
-    runs-on: ubuntu-latest
+  build-all-chips:
+    name: Build All Chips
+    runs-on: ubuntu-22.04
+
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y clang
-
-      - name: Build all chips in wokwi/chips
+      - name: Find and build each chip
         run: |
-          ROOT_DIR="$(pwd)/wokwi/chips"
-          for chip_dir in "$ROOT_DIR"/*/; do
-            CHIP_NAME=$(basename "$chip_dir")
-            SRC_FILE="$chip_dir/${CHIP_NAME}.chip.c"
-            JSON_FILE="$chip_dir/${CHIP_NAME}.chip.json"
-            OUT_FILE="$chip_dir/${CHIP_NAME}.chip.wasm"
+          find wokwi/chips -maxdepth 1 -mindepth 1 -type d | while read chip_dir; do
+            echo "\n🔧 Building chip in $chip_dir"
+            chip_name=$(basename "$chip_dir")
 
-            if [[ -f "$SRC_FILE" ]]; then
-              echo "Compilando $SRC_FILE → $OUT_FILE"
-              clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all -I "$ROOT_DIR" -o "$OUT_FILE" "$SRC_FILE" || echo "Erro ao compilar $SRC_FILE"
+            if [ -f "$chip_dir/src/main.c" ]; then
+              echo "→ Compiling $chip_name..."
+              wokwi/wokwi-chip-clang-action@main <<EOF > temp.yml
+              name: Temp Build
+              on: [push]
+              jobs:
+                build:
+                  runs-on: ubuntu-22.04
+                  steps:
+                    - uses: actions/checkout@v3
+                    - uses: wokwi/wokwi-chip-clang-action@main
+                      with:
+                        sources: "$chip_dir/src/main.c"
+EOF
+              echo "✅ Compiled $chip_name"
+
+              mkdir -p "$chip_dir/dist"
+              cp "$chip_dir/chip.json" "$chip_dir/dist/$chip_name.chip.json"
+              cp dist/chip.wasm "$chip_dir/dist/$chip_name.chip.wasm"
             else
-              echo "Arquivo fonte $SRC_FILE não encontrado. Pulando."
-            fi
-
-            if [[ ! -f "$JSON_FILE" ]]; then
-              echo "AVISO: $JSON_FILE não encontrado"
+              echo "⚠️ No main.c found in $chip_dir/src"
             fi
           done
 
-      - name: List all .wasm outputs (debug)
-        run: find wokwi/chips -name "*.wasm"
-
-      - name: Upload all .wasm files
-        uses: actions/upload-artifact@v4
+      - name: Upload all artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: compiled-chips
-          path: wokwi/chips/**/*.wasm
+          name: all-chips
+          path: wokwi/chips/**/dist/*.chip.*
