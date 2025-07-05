@@ -3,7 +3,7 @@ name: Build All Chips
 on:
   push:
     paths:
-      - 'chips/**'
+      - 'wokwi/chips/**'
       - '.github/workflows/**'
 
 jobs:
@@ -17,11 +17,11 @@ jobs:
       - name: List .chip.c files
         run: |
           echo "Procurando arquivos .chip.c:"
-          find chips -name "*.chip.c"
+          find wokwi/chips -name "*.chip.c"
 
       - name: Compile all .chip.c files
         run: |
-          for file in $(find chips -name "*.chip.c"); do
+          for file in $(find wokwi/chips -name "*.chip.c"); do
             base="${file%.chip.c}"
             echo "Compilando $file → ${base}.chip.wasm"
             clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all -o "${base}.chip.wasm" "$file" || echo "Erro ao compilar $file"
@@ -31,4 +31,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: compiled-chips
-          path: chips/**/*.wasm
+          path: wokwi/chips/**/*.wasm
