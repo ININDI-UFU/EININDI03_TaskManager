@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'wokwi/chips/**'
-      - 'wokwi/wokwi-api.h'
       - '.github/workflows/**'
 
 jobs:
@@ -24,20 +23,20 @@ jobs:
 
       - name: Verificar se wokwi-api.h existe
         run: |
-          if [ -f wokwi/wokwi-api.h ]; then
-            echo "wokwi-api.h encontrado!"
+          if [ -f wokwi/chips/wokwi-api.h ]; then
+            echo "wokwi-api.h encontrado em wokwi/chips!"
           else
-            echo "ERRO: wokwi-api.h não encontrado em wokwi/"
+            echo "ERRO: wokwi-api.h não encontrado em wokwi/chips/"
             exit 1
           fi
 
       - name: Compilar todos os .chip.c → .wasm
         run: |
-          WOKWI_INCLUDE="$(pwd)/wokwi"
+          INCLUDE_PATH="$(pwd)/wokwi/chips"
           for file in $(find wokwi/chips -name "*.chip.c"); do
             base="${file%.chip.c}"
             echo "Compilando $file → ${base}.chip.wasm"
-            clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all -I "$WOKWI_INCLUDE" -o "${base}.chip.wasm" "$file" || echo "Erro ao compilar $file"
+            clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all -I "$INCLUDE_PATH" -o "${base}.chip.wasm" "$file" || echo "Erro ao compilar $file"
           done
 
       - name: Upload arquivos .wasm como artefato
