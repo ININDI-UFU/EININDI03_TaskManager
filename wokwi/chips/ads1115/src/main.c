@@ -7,9 +7,9 @@ typedef struct {
   uint8_t pointer_reg;
   uint16_t config_reg;
   uint8_t config_bytes[2]; // MSB, LSB
+  uint8_t config_byte_count;
   uint16_t conversion_reg;
   bool msb;
-  uint8_t config_byte_count;
   bool expecting_pointer;
 } chip_t;
 
@@ -38,6 +38,7 @@ void chip_init() {
   chip->config_byte_count = 0;
   chip->config_bytes[0] = 0x85; // default power-on reset
   chip->config_bytes[1] = 0x83;
+  chip->config_reg = ((uint16_t)chip->config_bytes[0] << 8) | chip->config_bytes[1];
   chip->expecting_pointer = true;
 
   i2c_config_t cfg = {
@@ -50,17 +51,17 @@ void chip_init() {
     .disconnect = NULL,
     .user_data  = chip
   };
-
   printf("[chip-ads1115] Registrando i2c chip: addr=0x%02x, scl=%d, sda=%d\n", cfg.address, cfg.scl, cfg.sda);
   i2c_init(&cfg);
 
-  printf("[chip-ads1115] ADS1115 custom chip (FULL DEBUG) pronto!\n");
+  printf("[chip-ads1115] ADS1115 custom chip (FULL DEBUG, real-like) pronto!\n");
 }
 
 static bool on_i2c_connect(void *user_data, uint32_t address, bool read) {
   chip_t *chip = user_data;
   printf("[chip-ads1115] on_i2c_connect: addr=0x%02x, read=%d, chip=%p\n", address, read, chip);
-  chip->expecting_pointer = true; // Reseta para nova transação I2C
+  chip->expecting_pointer = true; // Sempre espera novo ponteiro após START
+  chip->config_byte_count = 0;    // Reseta contagem de bytes para registrador config
   return address == 0x48;
 }
 
@@ -74,22 +75,33 @@ static bool on_i2c_write(void *user_data, uint8_t data) {
     chip->msb = true;
     chip->expecting_pointer = false;
     printf("[chip-ads1115]   Novo pointer_reg=0x%02x, msb=%d\n", chip->pointer_reg, chip->msb);
-    if (chip->pointer_reg == 0x01) chip->config_byte_count = 0;
+    if (chip->pointer_reg == 0x01) {
+      chip->config_byte_count = 0; // Vai começar escrita de config
+      chip->config_bytes[0] = (chip->config_reg >> 8) & 0xFF;
+      chip->config_bytes[1] = chip->config_reg & 0xFF;
+    }
   } else {
     if (chip->pointer_reg == 0x01) {
-      if (chip->config_byte_count < 2) {
-        chip->config_bytes[chip->config_byte_count++] = data;
-        printf("[chip-ads1115]   Armazenando config_bytes[%d]=0x%02x\n",
-               chip->config_byte_count-1, data);
-        if (chip->config_byte_count == 2) {
-          chip->config_reg = ((uint16_t)chip->config_bytes[0] << 8) | chip->config_bytes[1];
-          printf("[chip-ads1115]   Config_reg atualizado: 0x%04x (MSB=0x%02x, LSB=0x%02x)\n",
-                 chip->config_reg, chip->config_bytes[0], chip->config_bytes[1]);
-          chip->config_byte_count = 0;
-        }
+      // Para config_reg, aceita até dois bytes, sobrescrevendo MSB e LSB
+      chip->config_bytes[chip->config_byte_count++] = data;
+      printf("[chip-ads1115]   Armazenando config_bytes[%d]=0x%02x\n",
+             chip->config_byte_count-1, data);
+
+      // Sempre que receber um byte, atualiza parcialmente o config_reg
+      if (chip->config_byte_count == 1) {
+        // Apenas MSB recebido: LSB permanece o que estava antes!
+        chip->config_reg = (chip->config_bytes[0] << 8) | (chip->config_bytes[1]);
+        printf("[chip-ads1115]   (MSB recebido) config_reg=0x%04x\n", chip->config_reg);
+      } else if (chip->config_byte_count == 2) {
+        chip->config_reg = (chip->config_bytes[0] << 8) | (chip->config_bytes[1]);
+        printf("[chip-ads1115]   (MSB+LSB recebidos) config_reg=0x%04x\n", chip->config_reg);
+        chip->config_byte_count = 0;
+        chip->expecting_pointer = true; // Após 2 bytes, espera novo ponteiro
       }
+    } else {
+      // Qualquer outro registrador: apenas um byte, já espera novo ponteiro em seguida
+      chip->expecting_pointer = true;
     }
-    chip->expecting_pointer = true;
   }
   return true;
 }
