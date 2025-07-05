@@ -8,3 +8,13 @@ rfc2217ServerPort = 4000
 [[net.forward]]
 from = "localhost:23"
 to = "target:23"
+
+
+# https://github.com/wokwi/esp32c6-i2c-lp/tree/main
+[[chip]]
+name = "bh1750"
+binary = "chips/bh1750/bh1750.chip.wasm"
+
+# [[chip]]
+# name = "opamp"
+# binary = "chips/opamp/dist/opamp.chip.wasm"
