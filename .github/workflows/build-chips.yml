@@ -2,49 +2,46 @@ name: Build All Chips
 
 on:
   push:
+    paths:
+      - 'wokwi/chips/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
-  build-all-chips:
-    name: Build All Chips
+  build-chips:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Find and build each chip
+      - name: Build all chips
         run: |
-          find wokwi/chips -maxdepth 1 -mindepth 1 -type d | while read chip_dir; do
-            echo "\n🔧 Building chip in $chip_dir"
-            chip_name=$(basename "$chip_dir")
+          ROOT_DIR="wokwi/chips"
+          for chip_dir in "$ROOT_DIR"/*/; do
+            CHIP_NAME=$(basename "$chip_dir")
+            CHIP_C="$chip_dir/${CHIP_NAME}.chip.c"
+            CHIP_JSON="$chip_dir/${CHIP_NAME}.chip.json"
+            DIST_DIR="$chip_dir/dist"
+            WASM_FILE="${DIST_DIR}/${CHIP_NAME}.chip.wasm"
 
-            if [ -f "$chip_dir/src/main.c" ]; then
-              echo "→ Compiling $chip_name..."
-              wokwi/wokwi-chip-clang-action@main <<EOF > temp.yml
-              name: Temp Build
-              on: [push]
-              jobs:
-                build:
-                  runs-on: ubuntu-22.04
-                  steps:
-                    - uses: actions/checkout@v3
-                    - uses: wokwi/wokwi-chip-clang-action@main
-                      with:
-                        sources: "$chip_dir/src/main.c"
-EOF
-              echo "✅ Compiled $chip_name"
+            echo "→ Compilando $CHIP_NAME"
+            mkdir -p "$DIST_DIR"
 
-              mkdir -p "$chip_dir/dist"
-              cp "$chip_dir/chip.json" "$chip_dir/dist/$chip_name.chip.json"
-              cp dist/chip.wasm "$chip_dir/dist/$chip_name.chip.wasm"
+            if [ -f "$CHIP_C" ] && [ -f "$CHIP_JSON" ]; then
+              clang --target=wasm32 -nostdlib -Wl,--no-entry -Wl,--export-all \
+                -I "$ROOT_DIR" -o "$WASM_FILE" "$CHIP_C"
+              cp "$CHIP_JSON" "$DIST_DIR/"
+              echo "✔️  $CHIP_NAME compilado com sucesso!"
             else
-              echo "⚠️ No main.c found in $chip_dir/src"
+              echo "⚠️  Pulando $CHIP_NAME: arquivos .chip.c ou .chip.json ausentes."
             fi
           done
 
       - name: Upload all artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: all-chips
-          path: wokwi/chips/**/dist/*.chip.*
+          name: compiled-chips
+          path: |
+            wokwi/chips/*/dist/*.chip.wasm
+            wokwi/chips/*/dist/*.chip.json
