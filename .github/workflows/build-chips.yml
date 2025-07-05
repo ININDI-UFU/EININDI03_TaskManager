@@ -5,66 +5,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build
+  build-chips:
+    name: Build ${{ matrix.chip }}
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        chip: [ads1115, bh1750, opamp]  # Adicione os chips que tiver na pasta wokwi/chips
+
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Compile all chips inside wokwi/chips/*
+      - name: Build chip ${{ matrix.chip }}
         uses: wokwi/wokwi-chip-clang-action@main
         with:
-          sources: |
-            wokwi/chips/*/*.chip.c
+          sources: wokwi/chips/${{ matrix.chip }}/src/main.c
+          chip-json: wokwi/chips/${{ matrix.chip }}/chip.json
 
-      - name: Rename and move outputs to proper dist folders
+      - name: Organize output files
         run: |
-          for dir in wokwi/chips/*/; do
-            name=$(basename "$dir")
-            wasm_file="dist/chip.wasm"
-            json_file="chip.json"
+          mkdir -p wokwi/chips/${{ matrix.chip }}/dist
+          mv dist/chip.wasm wokwi/chips/${{ matrix.chip }}/dist/${{ matrix.chip }}.chip.wasm
+          mv dist/chip.json wokwi/chips/${{ matrix.chip }}/dist/${{ matrix.chip }}.chip.json
 
-            if [[ -f "$wasm_file" ]]; then
-              mkdir -p "$dir/dist"
-              cp "$wasm_file" "$dir/dist/${name}.chip.wasm"
-              echo "✅ $wasm_file copiado para $dir/dist/${name}.chip.wasm"
-            else
-              echo "⚠️ $wasm_file não encontrado para $name"
-            fi
-
-            if [[ -f "$json_file" ]]; then
-              cp "$json_file" "$dir/dist/${name}.chip.json"
-              echo "✅ $json_file copiado para $dir/dist/${name}.chip.json"
-            else
-              echo "⚠️ $json_file não encontrado para $name"
-            fi
-          done
-
-      - name: Upload All Chips
+      - name: Upload artifacts for ${{ matrix.chip }}
         uses: actions/upload-artifact@v4
         with:
-          name: all-chips
-          path: wokwi/chips/*/dist/
-
-  release:
-    name: Release
-    needs: build
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download all chips
-        uses: actions/download-artifact@v4
-        with:
-          name: all-chips
-          path: chips-release
-
-      - name: Create a zip archive
-        run: cd chips-release && zip -9 -r ../chips.zip .
-
-      - name: Upload release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: chips.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: true
+          name: chip-${{ matrix.chip }}
+          path: wokwi/chips/${{ matrix.chip }}/dist/
