@@ -117,15 +117,13 @@
     [ "oled1:SCL", "ads1:SCL", "green", [ "v0" ] ],
     [ "oled1:SDA", "ads1:SDA", "green", [ "v-163.2", "h-115.13", "v-38.4" ] ],
     [ "ads1:AIN0", "pot3:SIG", "green", [ "v0", "h78.61" ] ],
-    [ "ads1:AIN1", "pot4:SIG", "green", [ "h165.01", "v-9.6" ] ],
     [ "pot4:VCC", "oled1:VCC", "red", [ "v144", "h-231.2" ] ],
     [ "pot3:VCC", "oled1:VCC", "red", [ "v144", "h-106.4" ] ],
     [ "pot3:GND", "esp:GND.2", "black", [ "v0", "h-192" ] ],
     [ "pot4:GND", "esp:GND.2", "black", [ "v9.6", "h-316.8" ] ],
-    [ "ads1:AIN0", "pot4:SIG", "green", [ "v0", "h165.01" ] ],
-    [ "ads1:AIN1", "pot3:SIG", "green", [ "h0" ] ],
     [ "ads1:VDD", "esp:3V3", "red", [ "h-148.8", "v20.22" ] ],
-    [ "ads1:ADDR", "esp:GND.2", "black", [ "h0" ] ]
+    [ "ads1:ADDR", "esp:GND.2", "black", [ "h0" ] ],
+    [ "ads1:AIN1", "pot4:SIG", "green", [ "h169.81", "v-46.98" ] ]
   ],
   "dependencies": {}
 }
