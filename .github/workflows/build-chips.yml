@@ -18,23 +18,18 @@ jobs:
             chip_name=$(basename "$dir")
             echo "🔧 Compilando chip: $chip_name"
             
-            # Define caminhos
             chip_c="$dir/${chip_name}.chip.c"
             chip_json="$dir/${chip_name}.chip.json"
             wasm_out="$dir/${chip_name}.chip.wasm"
-            
-            # Compilar
+
             if [ -f "$chip_c" ]; then
               echo "📦 Compilando $chip_c → $wasm_out"
-              wokwi/wokwi-chip-clang-action@main \
-                --sources "$chip_c" \
-                --output "$wasm_out"
+              npx wokwi-cli compile --chip "$chip_c" --output "$wasm_out"
             else
               echo "⚠️ Arquivo $chip_c não encontrado. Pulando..."
               continue
             fi
 
-            # Verifica se chip.json existe
             if [ -f "$chip_json" ]; then
               echo "✅ JSON encontrado: $chip_json"
             else
@@ -43,7 +38,7 @@ jobs:
           done
 
       - name: Upload todos os .wasm e .json como artefatos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: all-chips
           path: wokwi/chips/**/**/*.chip.*
