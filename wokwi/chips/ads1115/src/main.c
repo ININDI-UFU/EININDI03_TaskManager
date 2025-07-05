@@ -8,20 +8,23 @@ typedef struct {
   uint16_t config_reg;
   uint16_t conversion_reg;
   bool msb;
-  bool do_convert;      // flag para conversão sob demanda
+  bool do_convert; // flag para conversão sob demanda
 } chip_t;
 
 static bool     on_i2c_connect(void *user_data, uint32_t address, bool read);
-static bool     on_i2c_write(void *user_data, uint32_t data);
+static bool     on_i2c_write(void *user_data, uint8_t data);
 static uint8_t  on_i2c_read(void *user_data);
 
 void chip_init() {
   chip_t *chip = calloc(1, sizeof(chip_t));
+
+  // Inicializa entradas analógicas AIN0..AIN3
   for (int i = 0; i < 4; i++) {
-    char name[5];
+    char name[6];
     snprintf(name, sizeof(name), "AIN%d", i);
     chip->ain[i] = pin_init(name, ANALOG);
   }
+
   chip->pointer_reg = 0xFF;
   chip->msb = true;
   chip->do_convert = false;
@@ -31,13 +34,14 @@ void chip_init() {
     .scl        = pin_init("SCL", INPUT_PULLUP),
     .sda        = pin_init("SDA", INPUT_PULLUP),
     .connect    = on_i2c_connect,
-    .write      = on_i2c_write,
+    .write      = on_i2c_write,   // <- Assinatura correta!
     .read       = on_i2c_read,
     .disconnect = NULL,
     .user_data  = chip
   };
   i2c_init(&cfg);
-  printf("ADS1115 (on-demand) ready\n");
+
+  printf("ADS1115 custom chip (on-demand conversion) pronto!\n");
 }
 
 static bool on_i2c_connect(void *user_data, uint32_t address, bool read) {
@@ -45,16 +49,17 @@ static bool on_i2c_connect(void *user_data, uint32_t address, bool read) {
   return address == 0x48;
 }
 
-static bool on_i2c_write(void *user_data, uint32_t data) {
+static bool on_i2c_write(void *user_data, uint8_t data) {
   chip_t *chip = user_data;
+
   if (chip->pointer_reg == 0xFF) {
-    chip->pointer_reg = (uint8_t)data;
+    chip->pointer_reg = data;
     if (chip->pointer_reg == 0x00) {
-      chip->do_convert = true;  // sinaliza para converter
+      chip->do_convert = true;  // sinaliza para converter no próximo read
     }
   } else {
     if (chip->pointer_reg == 0x01) {
-      chip->config_reg = (chip->config_reg << 8) | (uint8_t)data;
+      chip->config_reg = (chip->config_reg << 8) | data;
     }
     chip->pointer_reg = 0xFF;
   }
@@ -63,6 +68,8 @@ static bool on_i2c_write(void *user_data, uint32_t data) {
 
 static uint8_t on_i2c_read(void *user_data) {
   chip_t *chip = user_data;
+
+  // Realiza conversão sob demanda antes de enviar bytes do conversion_reg
   if (chip->do_convert) {
     uint8_t mux = (chip->config_reg >> 12) & 0x07;
     if (mux < 4) {
