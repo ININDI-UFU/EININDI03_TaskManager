@@ -1,5 +1,6 @@
 #include "wokwi-api.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 // Estado do chip
 typedef struct {
@@ -8,26 +9,28 @@ typedef struct {
   uint8_t     pointer_reg;
   uint16_t    config_reg;
   uint16_t    conversion_reg;
+  bool        msb;
 } chip_t;
 
 // Protótipos
-static bool on_i2c_connect(void *user_data, uint32_t address, bool read);
-static bool on_i2c_write(void *user_data, uint8_t data);
-static uint8_t on_i2c_read(void *user_data);
-static void simulate_adc(void *user_data);
+static bool     on_i2c_connect(void *user_data, uint32_t address, bool read);
+static bool     on_i2c_write(void *user_data, uint8_t data);
+static uint8_t  on_i2c_read(void *user_data);
+static void     simulate_adc(void *user_data);
 
-// Função de inicialização (EXPORT)
-void* EXPORT(chip_init)(void) {
+// Inicialização do chip
+void EXPORT(chip_init)(void) {
   chip_t *chip = calloc(1, sizeof(chip_t));
 
-  // Configurar pinos analógicos
-  chip->ain[0] = pin_init("AIN0", ANALOG);
-  chip->ain[1] = pin_init("AIN1", ANALOG);
-  chip->ain[2] = pin_init("AIN2", ANALOG);
-  chip->ain[3] = pin_init("AIN3", ANALOG);
+  // Inicializa pinos analógicos AIN0–AIN3
+  for (int i = 0; i < 4; i++) {
+    char name[6];
+    snprintf(name, sizeof(name), "AIN%d", i);
+    chip->ain[i] = pin_init(name, ANALOG);
+  }
 
-  // Inicializar I2C com callbacks
-  static const i2c_config_t cfg = {
+  // Configuração I²C
+  const i2c_config_t cfg = {
     .address     = 0x48,
     .scl         = pin_init("SCL", INPUT_PULLUP),
     .sda         = pin_init("SDA", INPUT_PULLUP),
@@ -35,34 +38,31 @@ void* EXPORT(chip_init)(void) {
     .write       = on_i2c_write,
     .read        = on_i2c_read,
     .disconnect  = NULL,
-    .user_data   = NULL // será ajustado abaixo
+    .user_data   = chip
   };
-
   chip->i2c = i2c_init(&cfg);
-  chip->i2c.user_data = chip;
 
-  // Inicial pointer para indicar que próximo byte é pointer_reg
   chip->pointer_reg = 0xFF;
+  chip->msb = true;
 
-  // Timer para simular a conversão A/D a cada 1 ms
-  timer_config_t tcfg = {
+  // Timer para simulação ADC (~1 ms)
+  const timer_config_t tcfg = {
     .callback  = simulate_adc,
     .user_data = chip
   };
   timer_t t = timer_init(&tcfg);
-  timer_start(t, 1000000, true); // 1 000 000 microsegundos = 1 ms
+  timer_start(t, 1000, true);
 
-  return chip;
+  printf("ADS1115 initialized\n");
 }
 
-// Aceita conexão se o endereço estiver correto
+// Valida se o endereço I²C corresponde
 static bool on_i2c_connect(void *user_data, uint32_t address, bool read) {
   chip_t *chip = user_data;
-  (void)read;
   return address == chip->i2c.address;
 }
 
-// Escrita I2C: primeiro byte = pointer, depois payload
+// Escrita I²C (pointer ou config)
 static bool on_i2c_write(void *user_data, uint8_t data) {
   chip_t *chip = user_data;
   if (chip->pointer_reg == 0xFF) {
@@ -76,32 +76,29 @@ static bool on_i2c_write(void *user_data, uint8_t data) {
   return true;
 }
 
-// Leitura I2C: retorna MSB/LSB conforme pointer_reg
+// Leitura I²C (MSB/LSB de conversão ou config)
 static uint8_t on_i2c_read(void *user_data) {
   chip_t *chip = user_data;
-  static bool high = true;
   uint8_t out = 0xFF;
-
   if (chip->pointer_reg == 0x00) {
-    out = high ? (chip->conversion_reg >> 8) : (chip->conversion_reg & 0xFF);
-    high = !high;
+    out = chip->msb ? (chip->conversion_reg >> 8) : (chip->conversion_reg & 0xFF);
+    chip->msb = !chip->msb;
   } else if (chip->pointer_reg == 0x01) {
-    out = high ? (chip->config_reg >> 8) : (chip->config_reg & 0xFF);
-    high = !high;
+    out = chip->msb ? (chip->config_reg >> 8) : (chip->config_reg & 0xFF);
+    chip->msb = !chip->msb;
   }
-
   return out;
 }
 
-// Timer: simula ADC lendo pino analógico e atualiza conversion_reg
+// Atualiza resposta ADC a cada ~1 ms
 static void simulate_adc(void *user_data) {
   chip_t *chip = user_data;
   uint8_t mux = (chip->config_reg >> 12) & 0x07;
-  if (mux >= 4) return;
-
-  float voltage = pin_adc_read(chip->ain[mux]);
-  const float fsr = 4.096f;
-  int16_t code = (int16_t)((voltage / fsr) * 32767.0f);
-  if (code < 0) code = 0;
-  chip->conversion_reg = (uint16_t)code;
+  if (mux < 4) {
+    float v = pin_adc_read(chip->ain[mux]);
+    const float fsr = 4.096f;
+    int16_t code = (int16_t)((v / fsr) * 32767.0f);
+    if (code < 0) code = 0;
+    chip->conversion_reg = (uint16_t)code;
+  }
 }
