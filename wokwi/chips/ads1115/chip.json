@@ -8,10 +8,31 @@
     "GND",
     "SCL",
     "SDA",
-    "A0",
-    "A1",
-    "A2",
-    "A3"
+    "AIN0",
+    "AIN1",
+    "AIN2",
+    "AIN3"
   ],
-  "controls": []
+  "controls": [
+    {
+      "name": "AIN0",
+      "type": "number",
+      "initialValue": 1000
+    },
+    {
+      "name": "AIN1",
+      "type": "number",
+      "initialValue": 1000
+    },
+    {
+      "name": "AIN2",
+      "type": "number",
+      "initialValue": 1000
+    },
+    {
+      "name": "AIN3",
+      "type": "number",
+      "initialValue": 1000
+    }
+  ]
 }

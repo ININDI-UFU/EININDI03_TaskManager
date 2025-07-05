@@ -13,8 +13,12 @@ to = "target:23"
 # https://github.com/wokwi/esp32c6-i2c-lp/tree/main
 # https://github.com/Dlloydev/Wokwi-Chip-Scope
 [[chip]]
-name = "bh1750"
-binary = "chips/bh1750/dist/bh1750.chip.wasm"
+name = "ads1115"
+binary = "chips/ads1115/dist/ads1115.chip.wasm"
+
+# [[chip]]
+# name = "bh1750"
+# binary = "chips/bh1750/dist/bh1750.chip.wasm"
 
 # [[chip]]
 # name = "opamp"
