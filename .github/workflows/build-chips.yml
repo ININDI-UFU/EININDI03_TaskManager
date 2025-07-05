@@ -1,44 +1,70 @@
-name: Build All Custom Chips
+name: Build All Chips
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  build-all-chips:
+  build:
+    name: Build
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Compile each chip in wokwi/chips/*
-        shell: bash
+      - name: Compile all chips inside wokwi/chips/*
+        uses: wokwi/wokwi-chip-clang-action@main
+        with:
+          sources: |
+            wokwi/chips/*/*.chip.c
+
+      - name: Rename and move outputs to proper dist folders
         run: |
           for dir in wokwi/chips/*/; do
-            chip_name=$(basename "$dir")
-            echo "🔧 Compilando chip: $chip_name"
-            
-            chip_c="$dir/${chip_name}.chip.c"
-            chip_json="$dir/${chip_name}.chip.json"
-            wasm_out="$dir/${chip_name}.chip.wasm"
+            name=$(basename "$dir")
+            wasm_file="dist/chip.wasm"
+            json_file="chip.json"
 
-            if [ -f "$chip_c" ]; then
-              echo "📦 Compilando $chip_c → $wasm_out"
-              npx wokwi-cli compile --chip "$chip_c" --output "$wasm_out"
+            if [[ -f "$wasm_file" ]]; then
+              mkdir -p "$dir/dist"
+              cp "$wasm_file" "$dir/dist/${name}.chip.wasm"
+              echo "✅ $wasm_file copiado para $dir/dist/${name}.chip.wasm"
             else
-              echo "⚠️ Arquivo $chip_c não encontrado. Pulando..."
-              continue
+              echo "⚠️ $wasm_file não encontrado para $name"
             fi
 
-            if [ -f "$chip_json" ]; then
-              echo "✅ JSON encontrado: $chip_json"
+            if [[ -f "$json_file" ]]; then
+              cp "$json_file" "$dir/dist/${name}.chip.json"
+              echo "✅ $json_file copiado para $dir/dist/${name}.chip.json"
             else
-              echo "⚠️ JSON não encontrado: $chip_json"
+              echo "⚠️ $json_file não encontrado para $name"
             fi
           done
 
-      - name: Upload todos os .wasm e .json como artefatos
+      - name: Upload All Chips
         uses: actions/upload-artifact@v4
         with:
           name: all-chips
-          path: wokwi/chips/**/**/*.chip.*
+          path: wokwi/chips/*/dist/
+
+  release:
+    name: Release
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all chips
+        uses: actions/download-artifact@v4
+        with:
+          name: all-chips
+          path: chips-release
+
+      - name: Create a zip archive
+        run: cd chips-release && zip -9 -r ../chips.zip .
+
+      - name: Upload release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: chips.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
