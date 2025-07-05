@@ -72,19 +72,22 @@ static uint8_t on_i2c_read(void *user_data) {
   uint8_t out = 0xFF;
 
   if (chip->pointer_reg == 0x00) { // Conversion register
-    uint8_t mux = (chip->config_reg >> 12) & 0x07;
-    float v = 0;
-    switch(mux) {
-      case 4: v = pin_adc_read(chip->ain[0]); break;
-      case 5: v = pin_adc_read(chip->ain[1]); break;
-      case 6: v = pin_adc_read(chip->ain[2]); break;
-      case 7: v = pin_adc_read(chip->ain[3]); break;
-      default: v = 0; // Modos diferenciais não implementados
+    if (chip->msb) {
+      uint8_t mux = (chip->config_reg >> 12) & 0x07;
+      float v = 0;
+      printf("config_reg=0x%04x mux=%d\n", chip->config_reg, mux); // <<<<<< Veja aqui!
+      switch(mux) {
+        case 4: v = pin_adc_read(chip->ain[0]); break;
+        case 5: v = pin_adc_read(chip->ain[1]); break;
+        case 6: v = pin_adc_read(chip->ain[2]); break;
+        case 7: v = pin_adc_read(chip->ain[3]); break;
+        default: v = 0;
+      }
+      int16_t code = (int16_t)((v / 5.0f) * 32767.0f);
+      if (code < 0) code = 0;
+      chip->conversion_reg = (uint16_t)code;
+      printf("AIN%d = %.3fV => %d\n", mux-4, v, chip->conversion_reg); // <<<<<< Veja aqui!
     }
-    int16_t code = (int16_t)((v / 5.0f) * 32767.0f);
-    if (code < 0) code = 0;
-    chip->conversion_reg = (uint16_t)code;
-
     out = chip->msb ? (chip->conversion_reg >> 8) : (chip->conversion_reg & 0xFF);
     chip->msb = !chip->msb;
   }
