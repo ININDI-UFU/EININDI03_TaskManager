@@ -1,0 +1,30 @@
+{
+  "name": "lm324",
+  "author": "Prof. Josué Morais - UFU",
+  "description": "Simulação de LM324 com 4 amplificadores operacionais independentes. Controles de ganho e período aplicam-se aos 4 canais.",
+  "pins": [
+    "VCC", "VEE",
+    "A1IN+", "A1IN-", "A1OUT",
+    "A2IN+", "A2IN-", "A2OUT",
+    "A3IN+", "A3IN-", "A3OUT",
+    "A4IN+", "A4IN-", "A4OUT"
+  ],
+  "controls": [
+    {
+      "id": "gain",
+      "label": "Gain (x)",
+      "type": "range",
+      "min": 1,
+      "max": 100000,
+      "step": 100
+    },
+    {
+      "id": "period",
+      "label": "Sample Time (ms)",
+      "type": "range",
+      "min": 1,
+      "max": 100,
+      "step": 1
+    }
+  ]
+}

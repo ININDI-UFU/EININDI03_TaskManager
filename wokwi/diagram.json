@@ -27,8 +27,6 @@
       "attrs": { "color": "green" }
     },
     { "type": "board-ssd1306", "id": "oled1", "top": 99.14, "left": 57.83, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "pot1", "top": -39.7, "left": -221, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "pot2", "top": -39.7, "left": -317, "attrs": {} },
     { "type": "wokwi-slide-switch", "id": "sw1", "top": 215.6, "left": 60.7, "attrs": {} },
     { "type": "wokwi-slide-switch", "id": "sw2", "top": 215.6, "left": 108.7, "attrs": {} },
     {
@@ -74,7 +72,7 @@
       "attrs": { "value": "1000" }
     },
     { "type": "chip-ads1115", "id": "ads1", "top": -123.78, "left": 43.2, "attrs": {} },
-    { "type": "chip-opamp", "id": "ao1", "top": -115.2, "left": -278.4, "attrs": {} },
+    { "type": "chip-opamp", "id": "ao1", "top": -27.78, "left": -244.8, "attrs": {} },
     { "type": "wokwi-potentiometer", "id": "pot3", "top": -212.5, "left": 163, "attrs": {} },
     { "type": "wokwi-potentiometer", "id": "pot4", "top": -212.5, "left": 287.8, "attrs": {} }
   ],
@@ -88,9 +86,6 @@
     [ "oled1:SDA", "esp:21", "blue", [ "v-19.2", "h-124.73" ] ],
     [ "oled1:GND", "esp:GND.2", "black", [ "v-67.2", "h-96" ] ],
     [ "oled1:VCC", "esp:3V3", "red", [ "v-28.8", "h0.15", "v-76.8", "h-201.75" ] ],
-    [ "pot1:VCC", "esp:3V3", "red", [ "v0" ] ],
-    [ "esp:GND.2", "pot1:GND", "black", [ "v-86.4", "h-230.4", "v96", "h38.4" ] ],
-    [ "pot2:GND", "esp:GND.2", "black", [ "v19.2", "h-38.4", "v-96", "h326.4" ] ],
     [ "oled1:GND", "sw1:1", "black", [ "v0", "h-48", "v144" ] ],
     [ "sw2:1", "oled1:GND", "black", [ "v0", "h-19.2", "v-48", "h-48", "v-96" ] ],
     [ "sw1:3", "sw2:3", "green", [ "v19.2", "h48.2" ] ],
@@ -110,9 +105,6 @@
     [ "btn2:2.r", "esp:3V3", "red", [ "h19.4", "v-259", "h-364.8" ] ],
     [ "btn1:2.r", "btn2:2.r", "red", [ "h19.4", "v-47.8" ] ],
     [ "btn1:2.l", "esp:32", "green", [ "h-336", "v9.8" ] ],
-    [ "pot2:SIG", "esp:VN", "green", [ "v0" ] ],
-    [ "pot2:VCC", "esp:3V3", "red", [ "v0" ] ],
-    [ "pot1:SIG", "esp:VP", "green", [ "v0" ] ],
     [ "ads1:VCC", "esp:3V3", "red", [ "h0" ] ],
     [ "ads1:GND", "esp:GND.2", "black", [ "h0" ] ],
     [ "oled1:SCL", "ads1:SCL", "green", [ "v0" ] ],
