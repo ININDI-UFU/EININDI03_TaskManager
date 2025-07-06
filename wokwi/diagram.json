@@ -72,7 +72,7 @@
       "attrs": { "value": "1000" }
     },
     { "type": "chip-ads1115", "id": "ads1", "top": -123.78, "left": 43.2, "attrs": {} },
-    { "type": "chip-opamp", "id": "ao1", "top": -27.78, "left": -244.8, "attrs": {} },
+    { "type": "chip-opamp", "id": "ao1", "top": -37.38, "left": -254.4, "attrs": {} },
     { "type": "wokwi-potentiometer", "id": "pot3", "top": -212.5, "left": 163, "attrs": {} },
     { "type": "wokwi-potentiometer", "id": "pot4", "top": -212.5, "left": 287.8, "attrs": {} }
   ],

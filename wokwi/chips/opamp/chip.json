@@ -6,9 +6,9 @@
   "pins": [
     "VCC",
     "VEE",
-    "VOUT",
-    "VINP",
-    "VINN"
+    "OUT",
+    "IN+",
+    "IN-"
   ],
   "controls": [
     {
