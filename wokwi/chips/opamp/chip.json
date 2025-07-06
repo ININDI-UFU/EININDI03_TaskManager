@@ -1,5 +1,6 @@
 {
   "name": "opamp",
+  "svg": "chip.svg",
   "author": "Prof. Josué Morais - UFU",
   "description": "Amplificador operacional ideal com ajuste de ganho e tempo de simulação via potenciômetros",
   "pins": [

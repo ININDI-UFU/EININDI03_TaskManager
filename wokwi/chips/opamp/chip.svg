@@ -1,0 +1,35 @@
+<svg width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Triângulo do AmpOp -->
+  <polygon points="20,40 100,10 100,70" fill="#fff" stroke="#111" stroke-width="2"/>
+  <!-- Símbolo "+" -->
+  <text x="16" y="30" font-size="14" font-family="monospace" fill="#1a1a1a">+</text>
+  <!-- Símbolo "-" -->
+  <text x="16" y="56" font-size="14" font-family="monospace" fill="#1a1a1a">−</text>
+  <!-- Pino IN+ (esquerda superior) -->
+  <g id="pin-IN+">
+    <circle cx="10" cy="28" r="3" fill="#1976d2"/>
+    <rect x="0" y="25" width="10" height="6" fill="none"/>
+  </g>
+  <!-- Pino IN- (esquerda inferior) -->
+  <g id="pin-IN-">
+    <circle cx="10" cy="54" r="3" fill="#d32f2f"/>
+    <rect x="0" y="51" width="10" height="6" fill="none"/>
+  </g>
+  <!-- Pino OUT (ponta direita) -->
+  <g id="pin-OUT">
+    <circle cx="110" cy="40" r="3" fill="#388e3c"/>
+    <rect x="110" y="37" width="10" height="6" fill="none"/>
+  </g>
+  <!-- Pino VCC (acima) -->
+  <g id="pin-VCC">
+    <circle cx="60" cy="5" r="3" fill="#ffa000"/>
+    <rect x="57" y="0" width="6" height="10" fill="none"/>
+  </g>
+  <!-- Pino VEE (abaixo) -->
+  <g id="pin-VEE">
+    <circle cx="60" cy="75" r="3" fill="#1976d2"/>
+    <rect x="57" y="70" width="6" height="10" fill="none"/>
+  </g>
+  <!-- Texto identificador -->
+  <text x="62" y="40" font-size="12" font-family="monospace" fill="#333">A.O.</text>
+</svg>
