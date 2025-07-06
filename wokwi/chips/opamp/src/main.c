@@ -11,6 +11,7 @@ typedef struct {
 } opamp_chip_t;
 
 static void opamp_simulate(void *user_data);
+double control_get_value(const char *id);
 
 void chip_init() {
   opamp_chip_t *chip = calloc(1, sizeof(opamp_chip_t));
