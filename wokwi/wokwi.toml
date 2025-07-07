@@ -20,6 +20,6 @@ binary = "chips/ads1115/dist/ads1115.chip.wasm"
 # name = "bh1750"
 # binary = "chips/bh1750/dist/bh1750.chip.wasm"
 
-[[chip]]
-name = "opamp"
-binary = "chips/opamp/dist/opamp.chip.wasm"
+# [[chip]]
+# name = "opamp"
+# binary = "chips/opamp/dist/opamp.chip.wasm"

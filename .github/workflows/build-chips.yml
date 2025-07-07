@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        chip: [ads1115, bh1750, opamp] # adicione mais chips aqui conforme necessário
+        chip: [ads1115, bh1750, opamp, lm324] # adicione mais chips aqui conforme necessário
 
     steps:
       - name: Checkout repository
