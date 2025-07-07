@@ -71,28 +71,9 @@
       "left": -316.8,
       "attrs": { "value": "1000" }
     },
-    {
-      "type": "chip-scope",
-      "id": "scope1",
-      "top": -402.18,
-      "left": -273.6,
-      "attrs": {
-        "sampleTimeUs": "100",
-        "sampleTimeMs": "0",
-        "triggerChannel": "0",
-        "triggerMode": "1",
-        "crtColor": "0",
-        "trace0Color": "14",
-        "trace1Color": "12",
-        "trace2Color": "10",
-        "trace3Color": "2"
-      }
-    },
     { "type": "chip-ads1115", "id": "ads1", "top": -123.78, "left": 43.2, "attrs": {} },
-    { "type": "chip-opamp", "id": "ao1", "top": -38.4, "left": -249.6, "attrs": {} },
     { "type": "wokwi-potentiometer", "id": "pot3", "top": -212.5, "left": 163, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "pot4", "top": -212.5, "left": 287.8, "attrs": {} },
-    { "type": "chip-schmitt", "id": "schmitt1", "top": 10.62, "left": 321.6, "attrs": {} }
+    { "type": "wokwi-potentiometer", "id": "pot4", "top": -212.5, "left": 287.8, "attrs": {} }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -137,8 +118,6 @@
     [ "ads1:VDD", "esp:3V3", "red", [ "h0" ] ]
   ],
   "dependencies": {
-    "chip-scope": "github:josuemoraisgh/Wokwi-Chip-Scope@0.0.1",
-    "chip-opamp": "github:josuemoraisgh/Wokwi-Chip-Opamp@0.0.2",
-    "chip-schmitt": "github:drf5n/Wokwi-Chip-Schmitt-Trigger@1.0.0"
+    "chip-ads1115": "github:josuemoraisgh/Wokwi-Chip-Ads1115@0.0.2"
   }
 }
