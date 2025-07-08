@@ -72,35 +72,8 @@
       "attrs": { "value": "1000" }
     },
     { "type": "chip-ads1115", "id": "ads1", "top": -66.18, "left": 72, "attrs": {} },
-    { "type": "chip-buildwave", "id": "bw1", "top": -85.38, "left": -273.6, "attrs": {} },
-    {
-      "type": "chip-opamp",
-      "id": "ao1",
-      "top": -8.58,
-      "left": -273.6,
-      "rotate": 180,
-      "attrs": {}
-    },
     { "type": "wokwi-potentiometer", "id": "pot3", "top": -154.9, "left": 163, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "pot4", "top": -154.9, "left": 287.8, "attrs": {} },
-    { "type": "wokwi-vcc", "id": "vcc1", "top": -162.44, "left": -345.6, "attrs": {} },
-    { "type": "wokwi-gnd", "id": "gnd1", "top": 28.8, "left": -346.2, "attrs": {} },
-    {
-      "type": "wokwi-resistor",
-      "id": "r5",
-      "top": -33.6,
-      "left": -365.35,
-      "rotate": 90,
-      "attrs": { "value": "1000" }
-    },
-    {
-      "type": "wokwi-resistor",
-      "id": "r6",
-      "top": -100.8,
-      "left": -365.35,
-      "rotate": 90,
-      "attrs": { "value": "1000" }
-    }
+    { "type": "wokwi-potentiometer", "id": "pot4", "top": -154.9, "left": 287.8, "attrs": {} }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -142,19 +115,9 @@
     [ "ads1:ADDR", "esp:GND.2", "black", [ "h0" ] ],
     [ "ads1:AIN1", "pot4:SIG", "green", [ "h169.81", "v-46.98" ] ],
     [ "ads1:VDD", "esp:3V3", "red", [ "h0" ] ],
-    [ "ads1:SDA", "oled1:SDA", "blue", [ "h0" ] ],
-    [ "ao1:VCC", "esp:3V3", "red", [ "h0" ] ],
-    [ "ao1:VEE", "ads1:GND", "black", [ "h40.6", "v-66.84", "h9.6" ] ],
-    [ "ao1:OUT", "esp:EN", "green", [ "h21.4", "v48.36" ] ],
-    [ "r6:2", "r5:1", "green", [ "h0", "v8.4" ] ],
-    [ "r5:2", "gnd1:GND", "green", [ "h0" ] ],
-    [ "r6:1", "vcc1:VCC", "green", [ "h0" ] ],
-    [ "ao1:INP", "bw1:OUT", "green", [ "v0.36", "h-28.41", "v-76.8" ] ],
-    [ "ao1:INN", "r5:2", "green", [ "h0" ] ]
+    [ "ads1:SDA", "oled1:SDA", "blue", [ "h0" ] ]
   ],
   "dependencies": {
-    "chip-ads1115": "github:josuemoraisgh/Wokwi-Chip-Ads1115@0.0.2",
-    "chip-opamp": "github:josuemoraisgh/Wokwi-Chip-Opamp@0.0.3",
-    "chip-buildwave": "github:josuemoraisgh/Wokwi-Chip-Buildwave@0.0.1"
+    "chip-ads1115": "github:josuemoraisgh/Wokwi-Chip-Ads1115@0.0.2"
   }
 }
