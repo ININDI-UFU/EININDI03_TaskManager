@@ -1,12 +1,9 @@
-[data]
-kitid = 1
-
 [wokwi]
 version = 1
 elf = "../.pio/build/esp32/firmware.elf"
 firmware = "../.pio/build/esp32/firmware.bin"
 gdbServerPort = 3333
-rfc2217ServerPort = 4000
+rfc2217ServerPort = 4002
 
 [[net.forward]]
 from = "localhost:23"
