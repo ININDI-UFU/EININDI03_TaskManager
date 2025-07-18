@@ -72,16 +72,8 @@
       "attrs": { "value": "1000" }
     },
     { "type": "chip-ads1115", "id": "ads1", "top": -66.18, "left": 72, "attrs": {} },
-    { "type": "chip-buildwave", "id": "bw1", "top": -85.38, "left": -273.6, "attrs": {} },
-    {
-      "type": "chip-opamp",
-      "id": "ao1",
-      "top": -8.58,
-      "left": -273.6,
-      "rotate": 180,
-      "attrs": {}
-    },
     { "type": "wokwi-potentiometer", "id": "pot3", "top": -154.9, "left": 163, "attrs": {} },
+<<<<<<< HEAD
     { "type": "wokwi-potentiometer", "id": "pot4", "top": -154.9, "left": 287.8, "attrs": {} },
     { "type": "wokwi-vcc", "id": "vcc1", "top": -162.44, "left": -345.6, "attrs": {} },
     { "type": "wokwi-gnd", "id": "gnd1", "top": 28.8, "left": -346.2, "attrs": {} },
@@ -117,6 +109,9 @@
       "rotate": 180,
       "attrs": { "value": "1000" }
     }
+=======
+    { "type": "wokwi-potentiometer", "id": "pot4", "top": -154.9, "left": 287.8, "attrs": {} }
+>>>>>>> f3bfb323531adb6be0fd6c2284b6437e9833768c
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
@@ -158,6 +153,7 @@
     [ "ads1:ADDR", "esp:GND.2", "black", [ "h0" ] ],
     [ "ads1:AIN1", "pot4:SIG", "green", [ "h169.81", "v-46.98" ] ],
     [ "ads1:VDD", "esp:3V3", "red", [ "h0" ] ],
+<<<<<<< HEAD
     [ "ads1:SDA", "oled1:SDA", "blue", [ "h0" ] ],
     [ "ao1:VCC", "esp:3V3", "red", [ "h0" ] ],
     [ "ao1:VEE", "ads1:GND", "black", [ "h40.6", "v-66.84", "h9.6" ] ],
@@ -172,10 +168,11 @@
     [ "r8:2", "esp:GND.3", "black", [ "v0", "h-27.6", "v-182.4" ] ],
     [ "oled1:GND", "esp:GND.3", "black", [ "v0", "h-48", "v-9.6" ] ],
     [ "r7:2", "r8:2", "black", [ "v0", "h-27.6", "v-28.8" ] ]
+=======
+    [ "ads1:SDA", "oled1:SDA", "blue", [ "h0" ] ]
+>>>>>>> f3bfb323531adb6be0fd6c2284b6437e9833768c
   ],
   "dependencies": {
-    "chip-ads1115": "github:josuemoraisgh/Wokwi-Chip-Ads1115@0.0.2",
-    "chip-opamp": "github:josuemoraisgh/Wokwi-Chip-Opamp@0.0.3",
-    "chip-buildwave": "github:josuemoraisgh/Wokwi-Chip-Buildwave@0.0.1"
+    "chip-ads1115": "github:josuemoraisgh/Wokwi-Chip-Ads1115@0.0.2"
   }
 }
