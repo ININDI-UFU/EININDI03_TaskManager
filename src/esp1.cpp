@@ -6,8 +6,8 @@ void blinkLEDFunc(uint8_t pin) {
 }
 
 void managerInputFunc(void) {
-    const uint16_t vlPOT1 = analogRead(def_pin_ADC1);
-    const uint16_t vlPOT2 = analogRead(def_pin_ADC2);
+    const uint16_t vlPOT1 = IIKit.analogReadPot1(); //analogRead(def_pin_ADC1);
+    const uint16_t vlPOT2 = IIKit.analogReadPot2(); //analogRead(def_pin_ADC2);
     IIKit.disp.setText(2, ("P1:" + String(vlPOT1) + "  P2:" + String(vlPOT2)).c_str());
     IIKit.WSerial.plot("vlPOT1", vlPOT1);
     IIKit.WSerial.plot("vlPOT2", vlPOT2);
