@@ -1,5 +1,5 @@
 //https://docs.espressif.com/projects/arduino-esp32/en/latest/api/timer.html
-#include "IIKitmini.h"   // Biblioteca base do framework Arduino, necessária para funções básicas como Serial e delays.
+#include "IIKit.h"   // Biblioteca base do framework Arduino, necessária para funções básicas como Serial e delays.
 #define NUMTASKS 3
 #include "util/jtask.h"
 #include "util/dinDebounce.h"

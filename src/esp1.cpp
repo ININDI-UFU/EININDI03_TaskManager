@@ -1,4 +1,4 @@
-#include "IIKitmini.h"
+#include "IIKit.h"
 #include "util/asyncDelay.h"
 
 void blinkLEDFunc(uint8_t pin) {
