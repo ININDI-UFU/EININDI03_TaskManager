@@ -2,134 +2,144 @@
 Script pós-upload para o PlatformIO
 -----------------------------------
 
-Este script é executado automaticamente **após o upload do firmware** para o microcontrolador.
+Executado automaticamente após o upload do firmware.
 
-Funções principais:
-1. Ler o valor `kitId` do arquivo `platformio.ini`.
-2. Calcular o host e porta do dispositivo com base nesse ID.
-3. Enviar um comando UDP de controle para a extensão LasecPlot (rodando em 127.0.0.1),
-   usando o protocolo de UI baseado em prefixo ':':
+1) Lê [data] kitId e [lasecplot] udpPort do platformio.ini
+2) Calcula:
+   - host = f"iikit{kitId}.local"
+3) Envia para a extensão LasecPlot (127.0.0.1:udpPort):
+       :CONNECT:<host>:<47268>\n
+4) Atualiza AppData/Code/User/settings.json com lasecplot.udpPort = <udpPort>
 
-       :CONNECT:<host>:<porta_do_dispositivo>\n
-
-Autor: Josué Morais (adaptado e documentado)
+Autor: Josué Morais (ajustes e correções)
 """
 
-from pathlib import Path          # Manipulação de caminhos
-import configparser               # Leitura de arquivos .ini
-import socket                     # Comunicação UDP
-from SCons.Script import Import   # Acessar o objeto `env` do PlatformIO
+from pathlib import Path
+import configparser
+import socket
+from SCons.Script import Import  # Acessar o objeto `env` do PlatformIO
+import os, json, shutil, re
 
 # Importa o ambiente de build do PlatformIO (variável `env`)
 Import("env")
 
+# --- Configuráveis ---------------------------------------------------
+# CHAVE da setting da extensão (ajuste se sua extensão usar outro nome)
+VSCODE_KEY_CMD_PORT = "lasecplot.udpPort"
 
-# -------------------------------------------------------------------
-# 1. Função para ler o valor kitId do platformio.ini
-# -------------------------------------------------------------------
-def _read_kit_id_from_cfg():
-    """
-    Lê o valor inteiro 'kitId' da seção [data] no arquivo platformio.ini.
-    Retorna o kitId como inteiro, ou -1 se houver erro.
-    """
+# Porta fixa do servidor de comando da extensão (no PC)
+VSCODE_CONTROL_IP = "127.0.0.1"
+VSCODE_DEVICE_PORT = 47268
 
-    ini_path = Path(env["PROJECT_DIR"]) / "platformio.ini"
+# Defaults sensatos
+DEFAULT_KIT_ID = 0
+DEFAULT_UDP_PORT = 47269
 
-    config = configparser.ConfigParser()
-    config.read(ini_path, encoding="utf-8")
+# --- Utilidades JSONC ------------------------------------------------
+def _strip_jsonc(text: str) -> str:
+    # remove // e /* */ preservando strings
+    def _repl(m):
+        s = m.group(0)
+        return "" if s.startswith("/") else s
+    pattern = r'("(?:\\.|[^"\\])*")|(/\*[\s\S]*?\*/|//[^\n\r]*)'
+    return re.sub(pattern, lambda m: m.group(1) or "", text)
 
+def _load_jsonc(path: Path) -> dict:
+    if not path.exists():
+        return {}
     try:
-        kit_id = int(config["data"]["kitId"])
-        return kit_id
-    except Exception as e:
-        print(f"[LasecPlot] Aviso: erro ao ler kitId do platformio.ini: {e}")
-        return -1
+        return json.loads(_strip_jsonc(path.read_text(encoding="utf-8")) or "{}")
+    except Exception:
+        return {}
 
+def _ensure_dir(p: Path):
+    p.mkdir(parents=True, exist_ok=True)
 
-# -------------------------------------------------------------------
-# 2. Função para calcular host e porta do dispositivo
-# -------------------------------------------------------------------
-def _compute_target(kit_id: int):
+# --- 1) Leitura do platformio.ini -----------------------------------
+def _read_cfg(project_dir: Path):
     """
-    Usa o kitId para montar o nome de host e a porta do dispositivo.
-    Exemplo: se kit_id = 3 → host = 'iikit3.local', device_port = 47253
+    Retorna (kit_id:int, cmd_udp_port:int) a partir do platformio.ini
+    - kitId em [data]
+    - udpPort em [lasecplot]
     """
-    host = f"iikit{kit_id}.local"
-    device_port = 47250 + kit_id
-    return host, device_port
+    ini_path = project_dir / "platformio.ini"
+    cfg = configparser.ConfigParser()
+    cfg.read(ini_path, encoding="utf-8")
 
+    # kitId
+    kit_id = DEFAULT_KIT_ID
+    if cfg.has_section("data") and cfg.has_option("data", "kitId"):
+        try:
+            kit_id = cfg.getint("data", "kitId")
+        except ValueError:
+            print("[LasecPlot] Aviso: 'kitId' inválido, usando 0.")
 
-# -------------------------------------------------------------------
-# 3. Função para enviar o comando de controle via UDP
-# -------------------------------------------------------------------
-def _send_connect(
-    host: str,
-    device_port: int,
-    control_ip: str = "127.0.0.1",
-    vscode_udp_port: int = 47268,
-    timeout: float = 0.25,
-):
-    """
-    Envia para a extensão LasecPlot (rodando no PC) uma mensagem UDP
-    usando o protocolo de controle de UI (prefixo ':').
+    # udpPort (porta base de comando/config do projeto/extensão)
+    udp_port = DEFAULT_UDP_PORT
+    if cfg.has_section("lasecplot") and cfg.has_option("lasecplot", "udpPort"):
+        try:
+            udp_port = cfg.getint("lasecplot", "udpPort")
+        except ValueError:
+            print(f"[LasecPlot] Aviso: 'udpPort' inválido, usando {DEFAULT_UDP_PORT}.")
 
-    Formato da mensagem:
+    return kit_id, udp_port
 
-        :CONNECT:<host>:<device_port>\n
+# --- 2) Host do dispositivo -----------------------------------------
+def _compute_host(kit_id: int) -> str:
+    # Ajuste o prefixo se quiser "inindkit" em vez de "iikit"
+    return f"iikit{kit_id}.local"
 
-    Exemplo:
-
-        :CONNECT:iikit3.local:47253
-    """
-
-    # Monta a mensagem no formato combinado com a webview
+# --- 3) Envio do CONNECT --------------------------------------------
+def _send_connect(host: str, control_port : int, control_ip: str = VSCODE_CONTROL_IP,
+                  device_port: int = VSCODE_DEVICE_PORT, timeout: float = 0.25):
     msg_str = f":CONNECT:{host}:{device_port}\n"
-    msg = msg_str.encode("utf-8")
+    data = msg_str.encode("utf-8")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(timeout)
-
     try:
-        # Envia para o servidor UDP da extensão (porta fixa do VSCode)
-        sock.sendto(msg, (control_ip, vscode_udp_port))
-        print(
-            f"[LasecPlot] '{msg_str.strip()}' enviado para "
-            f"{control_ip}:{vscode_udp_port}"
-        )
-
+        sock.sendto(data, (control_ip, control_port))
+        print(f"[LasecPlot] '{msg_str.strip()}' enviado para {control_ip}:{control_port}")
     except Exception as e:
-        print(f"[LasecPlot] Aviso: não consegui enviar comando de controle ({e}).")
-
+        print(f"[LasecPlot] Aviso: falha ao enviar comando de controle ({e}).")
     finally:
         sock.close()
 
+# --- 4) Atualiza settings do User Setting -------------------------------
+def _update_user_settings_udp_port(project_dir: Path, udp_port: int):
+    vscode_dir = project_dir / ".vscode"
+    appdata = Path(os.environ.get("APPDATA", ""))
+    settings_path = appdata / "Code" / "User" / "settings.json"
+    _ensure_dir(vscode_dir)
 
-# -------------------------------------------------------------------
-# 4. Função que será executada automaticamente após o upload
-# -------------------------------------------------------------------
+    current = _load_jsonc(settings_path)
+    # >>> Se você quiser gravar a PORTA DO DISPOSITIVO nas settings,
+    # troque 'udp_port' por 'device_port' onde você chamar esta função.
+    if current.get(VSCODE_KEY_CMD_PORT) != udp_port:
+        if settings_path.exists():
+            shutil.copy2(settings_path, settings_path.with_suffix(".settings.json.bak"))
+        current[VSCODE_KEY_CMD_PORT] = udp_port
+        settings_path.write_text(json.dumps(current, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"[LasecPlot] {VSCODE_KEY_CMD_PORT} atualizado para {udp_port} em {settings_path}")
+    else:
+        print(f"[LasecPlot] {VSCODE_KEY_CMD_PORT} já está em {udp_port}; nada a fazer.")
+
+# --- 5) Hook pós-upload ---------------------------------------------
 def post_upload_action(source, target, env):  # type: ignore[override]
-    """
-    Essa função é chamada pelo PlatformIO **depois que o upload termina com sucesso**.
-    """
-
     print("[LasecPlot] Executando pós-upload...")
 
-    # 1. Lê o kitId do platformio.ini
-    kit_id = _read_kit_id_from_cfg()
-    if kit_id < 0:
-        print("[LasecPlot] kitId inválido. Ignorando envio de comando.")
-        return
+    project_dir = Path(env["PROJECT_DIR"])
+    kit_id, udp_port = _read_cfg(project_dir)
 
-    # 2. Calcula host e porta do dispositivo
-    host, device_port = _compute_target(kit_id)
+    host = _compute_host(kit_id)
 
-    # 3. Envia o comando de controle para a extensão
-    _send_connect(host, device_port)
+    # Atualiza settings do workspace com a porta base de comando
+    _update_user_settings_udp_port(project_dir, udp_port)
+
+    # Envia CONNECT para a extensão (no PC)
+    _send_connect(host, udp_port)
 
     print("[LasecPlot] Finalizado pós-upload com sucesso.")
 
-
-# -------------------------------------------------------------------
-# 5. Registro da função no sistema do PlatformIO
-# -------------------------------------------------------------------
+# Registro do hook
 env.AddPostAction("upload", post_upload_action)
