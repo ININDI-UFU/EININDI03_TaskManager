@@ -25,7 +25,9 @@ Import("env")
 
 # --- Configuráveis ---------------------------------------------------
 # CHAVE da setting da extensão (ajuste se sua extensão usar outro nome)
-VSCODE_KEY_CMD_PORT = "lasecplot.udpPort"
+VSCODE_KEY_UDP_PORT = "lasecplot.udpPort"
+VSCODE_KEY_CMD_PORT = "lasecplot.cmdUdpPort"
+VSCODE_KEY_DEVICE_IP = "lasecplot.remoteAddress"
 
 # Porta fixa do servidor de comando da extensão (no PC)
 VSCODE_CONTROL_IP = "127.0.0.1"
@@ -106,7 +108,7 @@ def _send_connect(host: str, control_port : int, control_ip: str = VSCODE_CONTRO
         sock.close()
 
 # --- 4) Atualiza settings do User Setting -------------------------------
-def _update_user_settings_udp_port(project_dir: Path, udp_port: int):
+def _update_user_settings_udp_port(project_dir: Path, udp_port: int, host: str):
     vscode_dir = project_dir / ".vscode"
     appdata = Path(os.environ.get("APPDATA", ""))
     settings_path = appdata / "Code" / "User" / "settings.json"
@@ -115,14 +117,18 @@ def _update_user_settings_udp_port(project_dir: Path, udp_port: int):
     current = _load_jsonc(settings_path)
     # >>> Se você quiser gravar a PORTA DO DISPOSITIVO nas settings,
     # troque 'udp_port' por 'device_port' onde você chamar esta função.
-    if current.get(VSCODE_KEY_CMD_PORT) != udp_port:
+    if current.get(VSCODE_KEY_CMD_PORT) != udp_port or current.get(VSCODE_KEY_CMD_PORT) != VSCODE_DEVICE_PORT or current.get(VSCODE_KEY_DEVICE_IP) != host:
         if settings_path.exists():
             shutil.copy2(settings_path, settings_path.with_suffix(".settings.json.bak"))
-        current[VSCODE_KEY_CMD_PORT] = udp_port
+        current[VSCODE_KEY_UDP_PORT] = udp_port
+        current[VSCODE_KEY_CMD_PORT] = VSCODE_DEVICE_PORT
+        current[VSCODE_KEY_DEVICE_IP] = host
         settings_path.write_text(json.dumps(current, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        print(f"[LasecPlot] {VSCODE_KEY_CMD_PORT} atualizado para {udp_port} em {settings_path}")
+        print(f"[LasecPlot] {VSCODE_KEY_UDP_PORT} atualizado para {udp_port} em {settings_path}")
+        print(f"[LasecPlot] {VSCODE_KEY_CMD_PORT} atualizado para {VSCODE_DEVICE_PORT} em {settings_path}")
+        print(f"[LasecPlot] {VSCODE_KEY_DEVICE_IP} atualizado para {host} em {settings_path}")
     else:
-        print(f"[LasecPlot] {VSCODE_KEY_CMD_PORT} já está em {udp_port}; nada a fazer.")
+        print(f"[LasecPlot] Nada a fazer.")
 
 # --- 5) Hook pós-upload ---------------------------------------------
 def post_upload_action(source, target, env):  # type: ignore[override]
@@ -134,7 +140,7 @@ def post_upload_action(source, target, env):  # type: ignore[override]
     host = _compute_host(kit_id)
 
     # Atualiza settings do workspace com a porta base de comando
-    _update_user_settings_udp_port(project_dir, udp_port)
+    _update_user_settings_udp_port(project_dir, udp_port, host)
 
     # Envia CONNECT para a extensão (no PC)
     _send_connect(host, udp_port)
